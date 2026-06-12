@@ -2,6 +2,7 @@ import { useMemo, type ReactNode } from "react";
 import { WagmiProvider, useWalletClient } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
 import { createPublicClient, http } from "viem";
 import {
   ZamaProvider,
@@ -12,6 +13,7 @@ import {
 import { ViemSigner } from "@zama-fhe/sdk/viem";
 import { wagmiConfig } from "@/lib/wagmi";
 import { env } from "@/lib/env";
+import "@rainbow-me/rainbowkit/styles.css";
 
 /**
  * Provider order matters — inner providers depend on outer context:
@@ -64,7 +66,9 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <ZamaSigned>{children}</ZamaSigned>
+        <RainbowKitProvider theme={darkTheme()} modalSize="compact">
+          <ZamaSigned>{children}</ZamaSigned>
+        </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

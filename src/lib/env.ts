@@ -32,4 +32,11 @@ export const env = {
   factoryAddressOverride: (import.meta.env.VITE_AIRDROP_FACTORY_ADDRESS ?? "") as
     | `0x${string}`
     | "",
+
+  /**
+   * WalletConnect Cloud project id (free) — required by RainbowKit for the
+   * WalletConnect / mobile-QR flows. Get one at https://cloud.walletconnect.com.
+   * Injected wallets (MetaMask) still work without it, but the modal warns.
+   */
+  walletConnectProjectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ?? "",
 } as const;

@@ -1,31 +1,10 @@
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { ConnectButton as RainbowConnectButton } from "@rainbow-me/rainbowkit";
 
-/** Minimal connect/disconnect button. Visual polish comes with the design pass. */
+/**
+ * Thin wrapper around RainbowKit's ConnectButton so the rest of the app imports
+ * a stable local name. RainbowKit handles the multi-wallet modal, account display,
+ * network switching, and disconnect.
+ */
 export function ConnectButton() {
-  const { address, isConnected } = useAccount();
-  const { connect, connectors, isPending } = useConnect();
-  const { disconnect } = useDisconnect();
-
-  if (isConnected && address) {
-    return (
-      <button
-        onClick={() => disconnect()}
-        className="rounded-md border border-white/15 px-3 py-1.5 text-sm hover:bg-white/5"
-        title={address}
-      >
-        {address.slice(0, 6)}…{address.slice(-4)}
-      </button>
-    );
-  }
-
-  const injected = connectors[0];
-  return (
-    <button
-      onClick={() => injected && connect({ connector: injected })}
-      disabled={!injected || isPending}
-      className="rounded-md bg-white px-3 py-1.5 text-sm font-medium text-neutral-900 hover:bg-neutral-200 disabled:opacity-50"
-    >
-      {isPending ? "Connecting…" : "Connect Wallet"}
-    </button>
-  );
+  return <RainbowConnectButton showBalance={false} accountStatus="address" chainStatus="icon" />;
 }
