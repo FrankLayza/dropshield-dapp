@@ -39,8 +39,8 @@ export function ConfidentialBalance({ tokenAddress }: { tokenAddress?: `0x${stri
   }
 
   return (
-    <div className="rounded-xl border border-edge bg-panel p-5">
-      <div className="flex items-center justify-between">
+    <div className="rounded-xl border border-edge bg-panel p-4 sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <div>
           <p className="text-sm font-semibold text-ink">Your confidential balance</p>
           <p className="mt-0.5 font-mono text-xs text-faint">
@@ -52,14 +52,14 @@ export function ConfidentialBalance({ tokenAddress }: { tokenAddress?: `0x${stri
           <button
             onClick={() => setRevealed(true)}
             disabled={!isConnected}
-            className="rounded-md border border-gold/40 bg-gold-tint/40 px-4 py-2 text-xs font-semibold text-gold-dim transition-all hover:bg-gold-tint/70 disabled:opacity-50"
+            className="w-full sm:w-auto rounded-md border border-gold/40 bg-gold-tint/40 px-4 py-2 text-xs font-semibold text-gold-dim transition-all hover:bg-gold-tint/70 disabled:opacity-50"
           >
             Reveal balance
           </button>
         ) : balanceQuery.isError ? (
           <button
             onClick={() => balanceQuery.refetch()}
-            className="rounded-md border border-edge-strong px-4 py-2 text-xs font-semibold text-mute hover:bg-panel-2 hover:text-ink"
+            className="w-full sm:w-auto rounded-md border border-edge-strong px-4 py-2 text-xs font-semibold text-mute hover:bg-panel-2 hover:text-ink"
           >
             Retry
           </button>

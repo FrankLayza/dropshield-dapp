@@ -216,11 +216,11 @@ export function StepCreate({
         </div>
       )}
 
-      <div className="flex items-center justify-between border-t border-edge pt-5">
+      <div className="flex flex-col-reverse gap-3 border-t border-edge pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <button
           onClick={onBack}
           disabled={createMutation.isPending}
-          className="inline-flex items-center gap-2 rounded-lg border border-edge-strong px-4 py-2.5 text-sm font-medium text-mute transition-colors duration-150 hover:text-ink disabled:opacity-50"
+          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-edge-strong px-4 py-2.5 text-sm font-medium text-mute transition-colors duration-150 hover:text-ink disabled:opacity-50"
         >
           ← Back
         </button>
@@ -228,7 +228,7 @@ export function StepCreate({
         <button
           onClick={handleDeploy}
           disabled={createMutation.isPending || !isConnected}
-          className="inline-flex items-center gap-2 rounded-lg bg-iris px-5 py-2.5 text-sm font-semibold text-white transition-all duration-150 hover:bg-iris-dim disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-iris px-5 py-2.5 text-sm font-semibold text-white transition-all duration-150 hover:bg-iris-dim disabled:cursor-not-allowed disabled:opacity-40"
         >
           {createMutation.isPending ? "Deploying..." : "Deploy campaign"}
         </button>

@@ -31,9 +31,9 @@ export function Stepper({
               <span
                 className={
                   "mt-2 whitespace-nowrap text-[11px] font-medium tracking-wide transition-colors duration-200 sm:text-xs " +
-                  // On mobile only the active label shows (5 labels overflow a phone);
-                  // all labels show from sm up.
-                  (status === "active" ? "block " : "hidden sm:block ") +
+                  // On mobile, hide all labels to prevent squeezing/overlap under the node circles.
+                  // The active step title is displayed in the page header on mobile instead.
+                  "hidden sm:block " +
                   (status === "active"
                     ? "text-gold-dim"
                     : status === "done"

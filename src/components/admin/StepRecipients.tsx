@@ -99,7 +99,7 @@ export function StepRecipients({
 
       {/* Table */}
       <div className="mt-6 overflow-hidden rounded-xl border border-edge bg-panel">
-        <div className="grid grid-cols-[1fr_auto_40px] items-center gap-3 border-b border-edge bg-panel-2 px-4 py-2.5">
+        <div className="hidden sm:grid grid-cols-[1fr_auto_40px] items-center gap-3 border-b border-edge bg-panel-2 px-4 py-2.5">
           <span className="text-xs font-medium uppercase tracking-wider text-faint">
             Wallet address
           </span>
@@ -128,9 +128,9 @@ export function StepRecipients({
             return (
               <div
                 key={r.id}
-                className="grid grid-cols-[1fr_auto_40px] items-start gap-3 border-b border-edge px-4 py-3 last:border-b-0"
+                className="flex flex-col gap-3 border-b border-edge px-4 py-4 last:border-b-0 sm:grid sm:grid-cols-[1fr_auto_40px] sm:items-start sm:gap-3 sm:py-3"
               >
-                <div>
+                <div className="w-full">
                   <input
                     value={r.address}
                     onChange={(e) => editRow(r.id, "address", e.target.value)}
@@ -147,27 +147,36 @@ export function StepRecipients({
                     <span className="mt-1 block text-xs text-danger">{addrIssue.message}</span>
                   )}
                 </div>
-                <div className="text-right">
-                  <input
-                    value={r.amount}
-                    onChange={(e) => editRow(r.id, "amount", e.target.value)}
-                    placeholder="Amount"
-                    inputMode="decimal"
-                    className={
-                      "w-32 rounded-md border bg-panel px-3 py-2 text-right font-mono text-sm font-medium text-ink placeholder:text-faint transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gold/40 " +
-                      (amtIssue
-                        ? "border-danger/60 focus:border-danger"
-                        : "border-edge-strong focus:border-ink")
-                    }
-                  />
-                  {amtIssue && (
-                    <span className="mt-1 block text-xs text-danger">{amtIssue.message}</span>
-                  )}
+                <div className="flex items-start gap-2.5 sm:block sm:text-right">
+                  <div className="flex-1 sm:w-auto">
+                    <input
+                      value={r.amount}
+                      onChange={(e) => editRow(r.id, "amount", e.target.value)}
+                      placeholder="Amount"
+                      inputMode="decimal"
+                      className={
+                        "w-full sm:w-32 rounded-md border bg-panel px-3 py-2 text-left sm:text-right font-mono text-sm font-medium text-ink placeholder:text-faint transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gold/40 " +
+                        (amtIssue
+                          ? "border-danger/60 focus:border-danger"
+                          : "border-edge-strong focus:border-ink")
+                      }
+                    />
+                    {amtIssue && (
+                      <span className="mt-1 block text-xs text-danger text-left sm:text-right">{amtIssue.message}</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => removeRow(r.id)}
+                    aria-label="Remove recipient"
+                    className="flex sm:hidden h-9 w-9 items-center justify-center rounded-md border border-edge-strong bg-panel text-mute transition-colors duration-150 hover:bg-danger/10 hover:text-danger"
+                  >
+                    <TrashIcon />
+                  </button>
                 </div>
                 <button
                   onClick={() => removeRow(r.id)}
                   aria-label="Remove recipient"
-                  className="mt-1 flex h-9 w-9 items-center justify-center rounded-md text-faint transition-colors duration-150 hover:bg-danger/10 hover:text-danger"
+                  className="hidden sm:flex mt-1 h-9 w-9 items-center justify-center rounded-md text-faint transition-colors duration-150 hover:bg-danger/10 hover:text-danger"
                 >
                   <TrashIcon />
                 </button>
@@ -188,8 +197,8 @@ export function StepRecipients({
       )}
 
       {/* Footer: total + advance */}
-      <div className="mt-6 flex items-center justify-between border-t border-edge pt-5">
-        <p className="text-sm text-mute">
+      <div className="mt-6 flex flex-col gap-4 border-t border-edge pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <p className="text-sm text-mute text-center sm:text-left">
           <span className="font-mono font-medium text-ink">{validCount}</span>{" "}
           recipient{validCount === 1 ? "" : "s"}
           <span className="mx-2 text-faint">·</span>
@@ -198,15 +207,16 @@ export function StepRecipients({
           </span>{" "}
           tokens total
           {validCount < recipients.length && (
-            <span className="ml-2 text-danger">
-              · {recipients.length - validCount} need fixing
+            <span className="mt-1 block text-danger sm:mt-0 sm:inline">
+              <span className="hidden sm:inline"> · </span>
+              {recipients.length - validCount} need fixing
             </span>
           )}
         </p>
         <button
           onClick={onNext}
           disabled={!canAdvance}
-          className="inline-flex items-center gap-2 rounded-lg bg-iris px-5 py-2.5 text-sm font-semibold text-white transition-all duration-150 hover:bg-iris-dim disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-iris px-5 py-2.5 text-sm font-semibold text-white transition-all duration-150 hover:bg-iris-dim disabled:cursor-not-allowed disabled:opacity-40"
         >
           Next: create campaign <ArrowIcon />
         </button>

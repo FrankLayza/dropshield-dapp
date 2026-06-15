@@ -13,7 +13,7 @@ export function App() {
     <ReactLenis root>
       <div className="min-h-full bg-bg text-ink noise-overlay mesh-gradient-bg">
         {/* ── Floating pill navbar ────────────────────────────────────── */}
-        <header className="sticky top-0 z-20 px-6 pt-4 pb-2">
+        <header className="sticky top-0 z-20 px-4 pt-3 pb-1.5 sm:px-6 sm:pt-4 sm:pb-2">
           <div className="mx-auto flex max-w-5xl items-center justify-between">
             {/* Left pill: logo + nav links */}
             <div className="flex items-center gap-1 rounded-full border border-edge/40 bg-panel/85 backdrop-blur-md px-2 py-1.5 shadow-lg shadow-black/10">
@@ -22,7 +22,7 @@ export function App() {
                 className="flex items-center gap-2 rounded-full px-3 py-1.5 font-display font-semibold tracking-tight transition-colors duration-150 hover:bg-panel-2/60"
               >
                 <Shield size={18} />
-                <span className="font-wordmark text-base lowercase tracking-wide">
+                <span className="font-wordmark text-base lowercase tracking-wide hidden sm:inline">
                   dropshield
                 </span>
               </Link>

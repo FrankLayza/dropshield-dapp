@@ -334,8 +334,8 @@ export function Claim() {
       ) : (
         <div className="space-y-6 animate-step-in">
           {/* Loaded details */}
-          <div className="rounded-xl border border-edge bg-panel p-5 space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="rounded-xl border border-edge bg-panel p-4 sm:p-5 space-y-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
               <span className="text-sm font-semibold text-ink">Airdrop Details</span>
               <button
                 onClick={() => {
@@ -348,7 +348,7 @@ export function Claim() {
                   setDecryptedAmount(null);
                   setRevealHandle("");
                 }}
-                className="text-xs font-semibold text-danger hover:underline"
+                className="text-xs font-semibold text-danger text-left sm:text-right hover:underline"
               >
                 Clear / Import another
               </button>
@@ -391,7 +391,7 @@ export function Claim() {
           </div>
 
           {/* Verification & Claim actions */}
-          <div className="rounded-2xl border border-edge bg-panel p-6 space-y-5">
+          <div className="rounded-2xl border border-edge bg-panel p-4 sm:p-6 space-y-5">
             {!isConnected ? (
               <div className="text-center py-6 text-sm text-mute">
                 Connect your wallet to check eligibility and claim.
@@ -472,7 +472,7 @@ export function Claim() {
       )}
 
       {successMsg && (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3.5 text-xs text-emerald-800">
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3.5 text-xs text-emerald-800 break-all">
           {successMsg}
         </div>
       )}

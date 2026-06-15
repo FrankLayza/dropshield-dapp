@@ -4,7 +4,7 @@ import { formatEther } from "viem";
 import { getFheAirdropFactoryAddress } from "@tokenops/sdk";
 import { useZamaSDK } from "@zama-fhe/react-sdk";
 import { useFundConfidentialAirdrop, useFactoryDefaultGasFee, useFactoryCustomFee } from "@tokenops/sdk/fhe-airdrop/react";
-import { formatTokens } from "@/lib/recipients";
+import { formatTokens, shortAddress } from "@/lib/recipients";
 
 interface StepFundProps {
   tokenAddress: string;
@@ -167,9 +167,10 @@ export function StepFund({
       </div>
 
       <div className="rounded-xl border border-edge bg-panel-2 p-4 space-y-3.5 text-sm">
-        <div className="flex justify-between">
+        <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-0">
           <span className="text-mute">Campaign clone</span>
-          <span className="font-mono font-medium text-ink">{campaignAddress}</span>
+          <span className="font-mono font-medium text-ink hidden sm:inline break-all">{campaignAddress}</span>
+          <span className="font-mono font-medium text-ink sm:hidden">{shortAddress(campaignAddress)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-mute">Required tokens</span>
@@ -255,11 +256,11 @@ export function StepFund({
         </div>
       )}
 
-      <div className="flex items-center justify-between border-t border-edge pt-5">
+      <div className="flex flex-col gap-3 border-t border-edge pt-5 sm:flex-row sm:items-center sm:justify-between">
         <button
           onClick={onBack}
           disabled={isApprovePending || isApproveConfirming || fundMutation.isPending}
-          className="inline-flex items-center gap-2 rounded-lg border border-edge-strong px-4 py-2.5 text-sm font-medium text-mute transition-colors duration-150 hover:text-ink disabled:opacity-50"
+          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-edge-strong px-4 py-2.5 text-sm font-medium text-mute transition-colors duration-150 hover:text-ink disabled:opacity-50"
         >
           ← Back
         </button>

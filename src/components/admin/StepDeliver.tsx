@@ -77,9 +77,10 @@ export function StepDeliver({
       </div>
 
       <div className="rounded-xl border border-edge bg-panel-2 p-5 space-y-3.5 text-sm">
-        <div className="flex justify-between">
+        <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-0">
           <span className="text-mute">Airdrop Address</span>
-          <span className="font-mono font-medium text-ink">{campaignAddress}</span>
+          <span className="font-mono font-medium text-ink hidden sm:inline break-all">{campaignAddress}</span>
+          <span className="font-mono font-medium text-ink sm:hidden">{shortAddress(campaignAddress)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-mute">Total Recipients</span>
@@ -105,25 +106,25 @@ export function StepDeliver({
         </div>
 
         {/* Links list */}
-        <div className="border border-edge rounded-xl bg-panel max-h-60 overflow-y-auto">
-          <table className="w-full text-left text-sm">
+        <div className="border border-edge rounded-xl bg-panel max-h-60 overflow-y-auto overflow-x-auto">
+          <table className="w-full text-left text-sm min-w-[340px]">
             <thead className="bg-panel-2 text-xs font-medium uppercase tracking-wider text-faint">
               <tr>
-                <th className="px-4 py-2.5">Recipient</th>
-                <th className="px-4 py-2.5 text-right">Amount</th>
-                <th className="px-4 py-2.5 text-right">Action</th>
+                <th className="px-3 sm:px-4 py-2.5">Recipient</th>
+                <th className="px-3 sm:px-4 py-2.5 text-right">Amount</th>
+                <th className="px-3 sm:px-4 py-2.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-edge font-mono">
               {authorizations.map((auth, idx) => (
                 <tr key={auth.address} className="hover:bg-panel-2/50">
-                  <td className="px-4 py-2.5 text-ink">
+                  <td className="px-3 sm:px-4 py-2.5 text-ink">
                     {shortAddress(auth.address)}
                   </td>
-                  <td className="px-4 py-2.5 text-right text-ink">
+                  <td className="px-3 sm:px-4 py-2.5 text-right text-ink">
                     {auth.amount}
                   </td>
-                  <td className="px-4 py-2.5 text-right">
+                  <td className="px-3 sm:px-4 py-2.5 text-right">
                     <button
                       onClick={() => handleCopyLink(auth, idx)}
                       className="inline-flex items-center gap-1 text-xs font-semibold text-iris hover:underline"
@@ -141,7 +142,7 @@ export function StepDeliver({
       <div className="flex items-center justify-center border-t border-edge pt-5">
         <button
           onClick={onReset}
-          className="inline-flex items-center gap-2 rounded-lg border border-edge-strong px-6 py-2.5 text-sm font-semibold text-ink transition-colors duration-150 hover:bg-panel-2"
+          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-edge-strong px-6 py-2.5 text-sm font-semibold text-ink transition-colors duration-150 hover:bg-panel-2"
         >
           Create another campaign
         </button>

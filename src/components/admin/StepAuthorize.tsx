@@ -135,13 +135,13 @@ export function StepAuthorize({
       </div>
 
       {/* Recipient Status Table */}
-      <div className="max-h-72 overflow-y-auto border border-edge rounded-xl bg-panel">
-        <table className="w-full text-left text-sm">
+      <div className="max-h-72 overflow-y-auto overflow-x-auto border border-edge rounded-xl bg-panel">
+        <table className="w-full text-left text-sm min-w-[340px]">
           <thead className="bg-panel-2 text-xs font-medium uppercase tracking-wider text-faint">
             <tr>
-              <th className="px-4 py-2.5">Address</th>
-              <th className="px-4 py-2.5 text-right">Amount</th>
-              <th className="px-4 py-2.5 text-right">Status</th>
+              <th className="px-3 sm:px-4 py-2.5">Address</th>
+              <th className="px-3 sm:px-4 py-2.5 text-right">Amount</th>
+              <th className="px-3 sm:px-4 py-2.5 text-right">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-edge font-mono">
@@ -149,13 +149,13 @@ export function StepAuthorize({
               const status = statuses[r.id];
               return (
                 <tr key={r.id} className="hover:bg-panel-2/50">
-                  <td className="px-4 py-2.5 text-ink">
+                  <td className="px-3 sm:px-4 py-2.5 text-ink">
                     {shortAddress(r.address)}
                   </td>
-                  <td className="px-4 py-2.5 text-right text-ink">
+                  <td className="px-3 sm:px-4 py-2.5 text-right text-ink">
                     {r.amount}
                   </td>
-                  <td className="px-4 py-2.5 text-right">
+                  <td className="px-3 sm:px-4 py-2.5 text-right">
                     {status === "pending" && (
                       <span className="text-faint">Pending</span>
                     )}
@@ -195,11 +195,11 @@ export function StepAuthorize({
         </div>
       )}
 
-      <div className="flex items-center justify-between border-t border-edge pt-5">
+      <div className="flex flex-col-reverse gap-3 border-t border-edge pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <button
           onClick={onBack}
           disabled={isRunning}
-          className="inline-flex items-center gap-2 rounded-lg border border-edge-strong px-4 py-2.5 text-sm font-medium text-mute transition-colors duration-150 hover:text-ink disabled:opacity-50"
+          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-edge-strong px-4 py-2.5 text-sm font-medium text-mute transition-colors duration-150 hover:text-ink disabled:opacity-50"
         >
           ← Back
         </button>
@@ -208,7 +208,7 @@ export function StepAuthorize({
           <button
             onClick={startAuthorizations}
             disabled={isRunning || !isConnected}
-            className="inline-flex items-center gap-2 rounded-lg bg-iris px-5 py-2.5 text-sm font-semibold text-white transition-all duration-150 hover:bg-iris-dim disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-iris px-5 py-2.5 text-sm font-semibold text-white transition-all duration-150 hover:bg-iris-dim disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isRunning
               ? "Processing..."

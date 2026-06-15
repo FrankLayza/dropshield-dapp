@@ -64,14 +64,14 @@ export function Admin() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <header className="mb-8 flex items-baseline justify-between">
+      <header className="mb-8 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 sm:gap-0">
         <h1 className="text-xl font-semibold tracking-tight">Campaign wizard</h1>
         <span className="font-mono text-xs text-faint">
-          step {current} of {STEPS.length}
+          step {current} of {STEPS.length} <span className="sm:hidden">— {STEPS[current - 1]?.label}</span>
         </span>
       </header>
 
-      <div className="rounded-2xl border border-edge bg-panel p-6 sm:p-8">
+      <div className="rounded-2xl border border-edge bg-panel p-4 sm:p-8">
         <div className="mb-8">
           <Stepper steps={STEPS} current={current} />
         </div>
