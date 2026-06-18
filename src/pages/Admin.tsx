@@ -5,7 +5,7 @@ import { StepCreate } from "@/components/admin/StepCreate";
 import { StepFund } from "@/components/admin/StepFund";
 import { StepAuthorize } from "@/components/admin/StepAuthorize";
 import { StepDeliver } from "@/components/admin/StepDeliver";
-import type { Recipient } from "@/lib/recipients";
+import type { Recipient, CampaignType } from "@/lib/recipients";
 import { totalRawUnits } from "@/lib/recipients";
 
 const STEPS: StepDef[] = [
@@ -19,6 +19,7 @@ const STEPS: StepDef[] = [
 export function Admin() {
   const [current, setCurrent] = useState(1);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const [campaignType, setCampaignType] = useState<CampaignType>("payroll");
 
   // Form states lifted for campaign parameters
   const [tokenAddress, setTokenAddress] = useState(
@@ -43,6 +44,7 @@ export function Admin() {
     Array<{
       address: string;
       amount: string;
+      label?: string;
       encryptedInput: { handle: string; inputProof: string };
       signature: string;
     }>
@@ -50,6 +52,7 @@ export function Admin() {
 
   const handleReset = () => {
     setRecipients([]);
+    setCampaignType("payroll");
     setCampaignAddress("");
     setAuthorizations([]);
     const now = Math.floor(Date.now() / 1000);
@@ -80,6 +83,8 @@ export function Admin() {
           <StepRecipients
             recipients={recipients}
             setRecipients={setRecipients}
+            campaignType={campaignType}
+            setCampaignType={setCampaignType}
             onNext={() => setCurrent(2)}
           />
         )}
@@ -135,6 +140,7 @@ export function Admin() {
             tokenAddress={tokenAddress}
             campaignAddress={campaignAddress}
             authorizations={authorizations}
+            campaignType={campaignType}
             onReset={handleReset}
           />
         )}

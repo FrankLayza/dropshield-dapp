@@ -11,6 +11,7 @@ interface StepAuthorizeProps {
     auths: Array<{
       address: string;
       amount: string;
+      label?: string;
       encryptedInput: { handle: string; inputProof: string };
       signature: string;
     }>
@@ -45,6 +46,7 @@ export function StepAuthorize({
     Array<{
       address: string;
       amount: string;
+      label?: string;
       encryptedInput: { handle: string; inputProof: string };
       signature: string;
     }>
@@ -95,6 +97,7 @@ export function StepAuthorize({
         tempAuths.push({
           address: recipient.address,
           amount: recipient.amount,
+          label: recipient.label,
           encryptedInput: {
             handle: encrypted.handle,
             inputProof: encrypted.inputProof,

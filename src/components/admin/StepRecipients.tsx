@@ -1,11 +1,14 @@
 import { useCallback, useRef, useState } from "react";
 import {
   type Recipient,
+  type CampaignType,
   validateRecipient,
   parseRecipientsCsv,
   totalRawUnits,
   formatTokens,
+  recipientNoun,
 } from "@/lib/recipients";
+import { CampaignTypeSelector } from "@/components/admin/CampaignTypeSelector";
 
 let _seq = 0;
 const newId = () => `r${_seq++}`;
@@ -17,12 +20,17 @@ const newId = () => `r${_seq++}`;
 export function StepRecipients({
   recipients,
   setRecipients,
+  campaignType,
+  setCampaignType,
   onNext,
 }: {
   recipients: Recipient[];
   setRecipients: (r: Recipient[]) => void;
+  campaignType: CampaignType;
+  setCampaignType: (t: CampaignType) => void;
   onNext: () => void;
 }) {
+  const noun = recipientNoun(campaignType);
   const [dragging, setDragging] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -56,13 +64,19 @@ export function StepRecipients({
     [ingest],
   );
 
-  const addRow = () => setRecipients([...recipients, { id: newId(), address: "", amount: "" }]);
-  const editRow = (id: string, field: "address" | "amount", value: string) =>
+  const addRow = () =>
+    setRecipients([...recipients, { id: newId(), address: "", amount: "", label: "" }]);
+  const editRow = (id: string, field: "address" | "amount" | "label", value: string) =>
     setRecipients(recipients.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
   const removeRow = (id: string) => setRecipients(recipients.filter((r) => r.id !== id));
 
   return (
     <div className="animate-step-in">
+      {/* Campaign type — display-only framing for the whole wizard. */}
+      <div className="mb-6">
+        <CampaignTypeSelector value={campaignType} onChange={setCampaignType} />
+      </div>
+
       {/* Dropzone */}
       <label
         onDragOver={(e) => {
@@ -92,16 +106,19 @@ export function StepRecipients({
         <UploadIcon />
         <p className="mt-3 text-lg font-medium text-ink">Drop recipients.csv here</p>
         <p className="mt-1 text-sm text-mute">
-          Columns: <span className="font-mono text-faint">address, amount</span> — or
-          add rows manually below
+          Columns: <span className="font-mono text-faint">address, amount, label</span> — label
+          is optional, or add rows manually below
         </p>
       </label>
 
       {/* Table */}
       <div className="mt-6 overflow-hidden rounded-xl border border-edge bg-panel">
-        <div className="hidden sm:grid grid-cols-[1fr_auto_40px] items-center gap-3 border-b border-edge bg-panel-2 px-4 py-2.5">
+        <div className="hidden sm:grid grid-cols-[1fr_170px_120px_40px] items-center gap-3 border-b border-edge bg-panel-2 px-4 py-2.5">
           <span className="text-xs font-medium uppercase tracking-wider text-faint">
             Wallet address
+          </span>
+          <span className="text-xs font-medium uppercase tracking-wider text-faint">
+            Label
           </span>
           <span className="text-right text-xs font-medium uppercase tracking-wider text-faint">
             Amount
@@ -128,7 +145,7 @@ export function StepRecipients({
             return (
               <div
                 key={r.id}
-                className="flex flex-col gap-3 border-b border-edge px-4 py-4 last:border-b-0 sm:grid sm:grid-cols-[1fr_auto_40px] sm:items-start sm:gap-3 sm:py-3"
+                className="flex flex-col gap-3 border-b border-edge px-4 py-4 last:border-b-0 sm:grid sm:grid-cols-[1fr_170px_120px_40px] sm:items-start sm:gap-3 sm:py-3"
               >
                 <div className="w-full">
                   <input
@@ -146,6 +163,14 @@ export function StepRecipients({
                   {addrIssue && (
                     <span className="mt-1 block text-xs text-danger">{addrIssue.message}</span>
                   )}
+                </div>
+                <div className="w-full">
+                  <input
+                    value={r.label ?? ""}
+                    onChange={(e) => editRow(r.id, "label", e.target.value)}
+                    placeholder="Label (optional)"
+                    className="w-full rounded-md border border-edge-strong bg-panel px-3 py-2 text-sm text-ink placeholder:text-faint transition-colors duration-150 focus:border-ink focus:outline-none focus:ring-2 focus:ring-gold/40"
+                  />
                 </div>
                 <div className="flex items-start gap-2.5 sm:block sm:text-right">
                   <div className="flex-1 sm:w-auto">
@@ -200,7 +225,7 @@ export function StepRecipients({
       <div className="mt-6 flex flex-col gap-4 border-t border-edge pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <p className="text-sm text-mute text-center sm:text-left">
           <span className="font-mono font-medium text-ink">{validCount}</span>{" "}
-          recipient{validCount === 1 ? "" : "s"}
+          {noun}{validCount === 1 ? "" : "s"}
           <span className="mx-2 text-faint">·</span>
           <span className="font-mono font-medium text-gold-dim">
             {formatTokens(total)}

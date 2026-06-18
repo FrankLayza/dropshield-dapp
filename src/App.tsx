@@ -11,42 +11,37 @@ export function App() {
   const { pathname } = useLocation();
 
   return (
-    <ReactLenis root>
+    <ReactLenis root options={{ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.95 }}>
       <div className="min-h-full bg-bg text-ink noise-overlay mesh-gradient-bg">
         <SpeedInsights />
-        {/* ── Floating pill navbar ────────────────────────────────────── */}
-        <header className="sticky top-0 z-20 px-4 pt-3 pb-1.5 sm:px-6 sm:pt-4 sm:pb-2">
-          <div className="mx-auto flex max-w-5xl items-center justify-between">
-            {/* Left pill: logo + nav links */}
-            <div className="flex items-center gap-1 rounded-full border border-edge/40 bg-panel/85 backdrop-blur-md px-2 py-1.5 shadow-lg shadow-black/10">
-              <Link
-                to="/"
-                className="flex items-center gap-2 rounded-full px-3 py-1.5 font-display font-semibold tracking-tight transition-colors duration-150 hover:bg-panel-2/60"
-              >
-                <Shield size={18} />
-                <span className="font-wordmark text-base lowercase tracking-wide hidden sm:inline">
-                  dropshield
-                </span>
-              </Link>
+        {/* ── Top navbar (Contiant-style: wordmark left, links + action right) ── */}
+        <header className="sticky top-0 z-20 bg-bg/70 backdrop-blur-md">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+            {/* Wordmark — far left */}
+            <Link
+              to="/"
+              className="flex items-center gap-2.5 transition-opacity duration-150 hover:opacity-80"
+            >
+              <Shield size={20} />
+              <span className="font-wordmark text-base lowercase tracking-tight text-ink sm:text-lg">
+                dropshield
+              </span>
+            </Link>
 
-              <span className="mx-1 h-4 w-px bg-edge/55" aria-hidden />
-
-              <NavPill to="/admin" active={pathname.startsWith("/admin")}>
+            {/* Links + action — far right */}
+            <nav className="flex items-center gap-4 sm:gap-8">
+              <NavLink to="/admin" active={pathname.startsWith("/admin")}>
                 Create
-              </NavPill>
-              <NavPill to="/claim" active={pathname.startsWith("/claim")}>
+              </NavLink>
+              <NavLink to="/claim" active={pathname.startsWith("/claim")}>
                 Claim
-              </NavPill>
-            </div>
-
-            {/* Right side: Connect Button */}
-            <div className="flex items-center gap-2">
+              </NavLink>
               <ConnectButton />
-            </div>
+            </nav>
           </div>
         </header>
 
-        <main className="mx-auto max-w-5xl px-6 py-14">
+        <main className="mx-auto max-w-5xl px-6 pb-16 pt-3">
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/admin" element={<Admin />} />
@@ -61,8 +56,8 @@ export function App() {
   );
 }
 
-/** Nav link inside the floating pill — uppercase, small, rounded-full. */
-function NavPill({
+/** Top-nav text link — Contiant-style: plain, medium-weight, gray→ink on hover. */
+function NavLink({
   to,
   active,
   children,
@@ -75,10 +70,8 @@ function NavPill({
     <Link
       to={to}
       className={
-        "rounded-full px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider transition-all duration-150 " +
-        (active
-          ? "bg-iris text-white shadow-sm"
-          : "text-mute hover:bg-panel-2/50 hover:text-ink")
+        "link-rise text-sm font-medium transition-colors duration-150 " +
+        (active ? "text-ink" : "text-mute hover:text-ink")
       }
     >
       {children}

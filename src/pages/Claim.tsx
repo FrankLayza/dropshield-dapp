@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion, useReducedMotion, useMotionValue, animate } from "framer-motion";
 import { useAccount } from "wagmi";
 import { useUserDecrypt } from "@zama-fhe/react-sdk";
 import {
@@ -6,7 +7,7 @@ import {
   useClaim,
   useAirdropIsSignatureClaimed,
 } from "@tokenops/sdk/fhe-airdrop/react";
-import { formatTokens, shortAddress } from "@/lib/recipients";
+import { formatTokens, shortAddress, TOKEN_DECIMALS } from "@/lib/recipients";
 import { ConfidentialBalance } from "@/components/ConfidentialBalance";
 
 export function Claim() {
@@ -19,6 +20,7 @@ export function Claim() {
   const [encryptedHandle, setEncryptedHandle] = useState<`0x${string}` | "">("");
   const [inputProof, setInputProof] = useState<`0x${string}` | "">("");
   const [signature, setSignature] = useState<`0x${string}` | "">("");
+  const [recipientLabel, setRecipientLabel] = useState("");
 
   // Process / verify states
   const [revealHandle, setRevealHandle] = useState<`0x${string}` | "">("");
@@ -27,6 +29,7 @@ export function Claim() {
   const [successMsg, setSuccessMsg] = useState("");
   const [dragging, setDragging] = useState(false);
   const [showJsonInput, setShowJsonInput] = useState(false);
+  const [showManualImport, setShowManualImport] = useState(false);
   const [pastedJson, setPastedJson] = useState("");
 
   // 1) Parse parameters from URL hash if present
@@ -41,6 +44,7 @@ export function Claim() {
       const h = params.get("h");
       const p = params.get("p");
       const s = params.get("s");
+      const l = params.get("l"); // optional display label
 
       if (c && r && a && h && p && s) {
         setCampaignAddress(c);
@@ -49,6 +53,7 @@ export function Claim() {
         setEncryptedHandle(h as `0x${string}`);
         setInputProof(p as `0x${string}`);
         setSignature(s as `0x${string}`);
+        if (l) setRecipientLabel(l);
         window.location.hash = ""; // Clear hash to keep URL clean
       }
     } catch (err) {
@@ -92,6 +97,7 @@ export function Claim() {
         setEncryptedHandle(auth.encryptedInput?.handle || auth.handle);
         setInputProof(auth.encryptedInput?.inputProof || auth.inputProof || auth.proof);
         setSignature(auth.signature || auth.sig);
+        setRecipientLabel(auth.label || "");
       } catch (err) {
         setErrorMsg("Failed to parse JSON file.");
       }
@@ -245,6 +251,43 @@ export function Claim() {
 
       {!isLoaded ? (
         <div className="space-y-4">
+          {/* Link-first empty state. Recipients arrive via a private claim link
+              whose URL fragment auto-populates the claim — no upload needed. The
+              JSON import is a fallback, hidden behind a toggle. */}
+          <div className="rounded-xl border border-edge bg-panel p-6 text-center space-y-3">
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-gold/10 text-gold-dim">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+              </svg>
+            </span>
+            <div>
+              <h2 className="text-base font-semibold text-ink">Open your private claim link</h2>
+              <p className="text-sm text-mute mt-1">
+                Your sender shared a one-time claim link. Open it and your encrypted
+                allocation loads here automatically — nothing to upload.
+              </p>
+            </div>
+          </div>
+
+          {!showManualImport ? (
+            <button
+              onClick={() => setShowManualImport(true)}
+              className="w-full text-center text-xs font-semibold text-faint hover:text-mute"
+            >
+              Received a payload file instead? Import it manually
+            </button>
+          ) : (
+            <div className="space-y-4 animate-step-in">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-mute">Manual import (fallback)</span>
+                <button
+                  onClick={() => setShowManualImport(false)}
+                  className="text-xs font-semibold text-faint hover:text-mute"
+                >
+                  Hide
+                </button>
+              </div>
           {/* Dropzone */}
           <label
             onDragOver={(e) => {
@@ -330,13 +373,17 @@ export function Claim() {
               </div>
             </div>
           )}
+            </div>
+          )}
         </div>
       ) : (
         <div className="space-y-6 animate-step-in">
           {/* Loaded details */}
           <div className="rounded-xl border border-edge bg-panel p-4 sm:p-5 space-y-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-              <span className="text-sm font-semibold text-ink">Airdrop Details</span>
+              <span className="text-sm font-semibold text-ink">
+                {recipientLabel ? `Allocation for ${recipientLabel}` : "Airdrop Details"}
+              </span>
               <button
                 onClick={() => {
                   setCampaignAddress("");
@@ -345,6 +392,7 @@ export function Claim() {
                   setEncryptedHandle("");
                   setInputProof("");
                   setSignature("");
+                  setRecipientLabel("");
                   setDecryptedAmount(null);
                   setRevealHandle("");
                 }}
@@ -367,11 +415,20 @@ export function Claim() {
                   {shortAddress(recipientAddress)}
                 </span>
               </div>
-              <div className="flex justify-between py-2">
-                <span className="text-mute">Expected Amount</span>
-                <span className="font-mono font-medium text-ink">
-                  {plaintextAmount} tokens
-                </span>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-mute">Your Allocation</span>
+                {decryptedAmount === null ? (
+                  <span
+                    className="font-mono font-medium tracking-widest text-faint select-none"
+                    title="Encrypted on-chain — decrypt to reveal"
+                  >
+                    •••••• tokens
+                  </span>
+                ) : (
+                  <span className="font-mono font-semibold text-ink">
+                    <AmountReveal raw={decryptedAmount} /> tokens
+                  </span>
+                )}
               </div>
             </div>
 
@@ -382,8 +439,8 @@ export function Claim() {
                 <div>
                   <p className="font-semibold">Cryptographically Verified</p>
                   <p className="text-xs opacity-90">
-                    Decrypted allocation on-chain matches the expected{" "}
-                    {formatTokens(decryptedAmount)} tokens.
+                    The on-chain ciphertext decrypts to {formatTokens(decryptedAmount)} tokens
+                    {plaintextAmount ? " — matching the amount your sender committed" : ""}.
                   </p>
                 </div>
               </div>
@@ -443,20 +500,27 @@ export function Claim() {
                   </div>
                 )}
 
-                {/* Claim */}
+                {/* Claim — gated on verification. The recipient must decrypt and
+                    confirm their on-chain allocation before the claim is unlocked. */}
                 <div className="space-y-2.5 pt-3 border-t border-edge">
                   <h3 className="text-sm font-semibold text-ink">
-                    {decryptedAmount !== null ? "Claim Tokens" : "2. Claim Tokens"}
+                    2. Claim Tokens
                   </h3>
                   <p className="text-xs text-mute">
-                    Consumes your claim signature and transfers the encrypted tokens directly to your wallet.
+                    {decryptedAmount === null
+                      ? "Verify your allocation above to unlock claiming."
+                      : "Consumes your claim signature and transfers the encrypted tokens directly to your wallet."}
                   </p>
                   <button
                     onClick={handleClaim}
-                    disabled={claimMutation.isPending}
-                    className="w-full rounded-lg bg-iris py-2.5 text-sm font-semibold text-white transition-all hover:bg-iris-dim disabled:opacity-50"
+                    disabled={claimMutation.isPending || decryptedAmount === null}
+                    className="w-full rounded-lg bg-iris py-2.5 text-sm font-semibold text-white transition-all hover:bg-iris-dim disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    {claimMutation.isPending ? "Claiming..." : "Claim Allocation"}
+                    {claimMutation.isPending
+                      ? "Claiming..."
+                      : decryptedAmount === null
+                        ? "Verify to unlock"
+                        : "Claim Allocation"}
                   </button>
                 </div>
               </div>
@@ -486,5 +550,46 @@ export function Claim() {
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * AmountReveal — animates a confidential allocation from 0 up to its decrypted
+ * value, turning the FHE decrypt into the visible "reveal" moment. Honors the
+ * user's reduced-motion preference by snapping straight to the final value.
+ */
+function AmountReveal({ raw }: { raw: bigint }) {
+  const reduceMotion = useReducedMotion();
+  const target = Number(raw) / 10 ** TOKEN_DECIMALS;
+  const mv = useMotionValue(reduceMotion ? target : 0);
+  const [display, setDisplay] = useState(reduceMotion ? target : 0);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setDisplay(target);
+      return;
+    }
+    const controls = animate(mv, target, {
+      duration: 0.9,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setDisplay(v),
+    });
+    return () => controls.stop();
+  }, [mv, target, reduceMotion]);
+
+  // Snap to the exact decrypted value (avoids float drift on the final frame).
+  const isSettled = Math.abs(display - target) < 0.5;
+  const text = isSettled
+    ? formatTokens(raw)
+    : display.toLocaleString("en-US", { maximumFractionDigits: 0 });
+
+  return (
+    <motion.span
+      initial={reduceMotion ? false : { opacity: 0.4 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      {text}
+    </motion.span>
   );
 }

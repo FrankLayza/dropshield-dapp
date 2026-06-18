@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { shortAddress } from "@/lib/recipients";
+import { shortAddress, recipientNoun, type CampaignType } from "@/lib/recipients";
 
 interface StepDeliverProps {
   tokenAddress: string;
@@ -7,9 +7,11 @@ interface StepDeliverProps {
   authorizations: Array<{
     address: string;
     amount: string;
+    label?: string;
     encryptedInput: { handle: string; inputProof: string };
     signature: string;
   }>;
+  campaignType: CampaignType;
   onReset: () => void;
 }
 
@@ -17,14 +19,20 @@ export function StepDeliver({
   tokenAddress,
   campaignAddress,
   authorizations,
+  campaignType,
   onReset,
 }: StepDeliverProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [copiedAll, setCopiedAll] = useState(false);
+  const noun = recipientNoun(campaignType);
 
   const getClaimLink = (auth: (typeof authorizations)[0]) => {
     const origin = window.location.origin;
     const path = "/claim";
-    const hash = `c=${campaignAddress}&r=${auth.address}&a=${auth.amount}&h=${auth.encryptedInput.handle}&p=${auth.encryptedInput.inputProof}&s=${auth.signature}`;
+    // Label is free text → URL-encode it. URLSearchParams on the claim page
+    // auto-decodes. The hex/numeric fields are already URL-safe.
+    const labelPart = auth.label ? `&l=${encodeURIComponent(auth.label)}` : "";
+    const hash = `c=${campaignAddress}&r=${auth.address}&a=${auth.amount}&h=${auth.encryptedInput.handle}&p=${auth.encryptedInput.inputProof}&s=${auth.signature}${labelPart}`;
     return `${origin}${path}#${hash}`;
   };
 
@@ -35,6 +43,20 @@ export function StepDeliver({
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
+  // Bulk export for pasting into email / Notion / a spreadsheet.
+  const csvEscape = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+  const handleCopyAllCsv = () => {
+    const header = "label,address,amount,claimLink";
+    const rows = authorizations.map((auth) =>
+      [auth.label ?? "", auth.address, auth.amount, getClaimLink(auth)]
+        .map((c) => csvEscape(String(c)))
+        .join(",")
+    );
+    navigator.clipboard.writeText([header, ...rows].join("\n"));
+    setCopiedAll(true);
+    setTimeout(() => setCopiedAll(false), 2000);
+  };
+
   const handleDownloadJson = () => {
     const data = {
       campaignAddress,
@@ -42,6 +64,7 @@ export function StepDeliver({
       authorizations: authorizations.map((auth) => ({
         recipient: auth.address,
         amount: auth.amount,
+        label: auth.label ?? "",
         encryptedInput: auth.encryptedInput,
         signature: auth.signature,
       })),
@@ -92,25 +115,33 @@ export function StepDeliver({
         <div>
           <h3 className="text-sm font-semibold text-ink">Deliver allocations</h3>
           <p className="text-xs text-mute mt-0.5">
-            Amounts are private and never go on-chain. Share the signed EIP-712 claims with your recipients.
+            Amounts are private and never go on-chain. Share each private claim link with the
+            matching {noun} — they open it to verify and claim.
           </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <button
-            onClick={handleDownloadJson}
+            onClick={handleCopyAllCsv}
             className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-iris px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-iris-dim"
           >
-            <DownloadIcon /> Download JSON Payload
+            {copiedAll ? "Copied all links!" : "Copy all as CSV"}
+          </button>
+          <button
+            onClick={handleDownloadJson}
+            className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-edge-strong px-4 py-3 text-sm font-semibold text-ink transition-all hover:bg-panel-2"
+          >
+            <DownloadIcon /> Download JSON
           </button>
         </div>
 
         {/* Links list */}
         <div className="border border-edge rounded-xl bg-panel max-h-60 overflow-y-auto overflow-x-auto">
-          <table className="w-full text-left text-sm min-w-[340px]">
+          <table className="w-full text-left text-sm min-w-[380px]">
             <thead className="bg-panel-2 text-xs font-medium uppercase tracking-wider text-faint">
               <tr>
-                <th className="px-3 sm:px-4 py-2.5">Recipient</th>
+                <th className="px-3 sm:px-4 py-2.5">Label</th>
+                <th className="px-3 sm:px-4 py-2.5">{noun}</th>
                 <th className="px-3 sm:px-4 py-2.5 text-right">Amount</th>
                 <th className="px-3 sm:px-4 py-2.5 text-right">Action</th>
               </tr>
@@ -118,6 +149,9 @@ export function StepDeliver({
             <tbody className="divide-y divide-edge font-mono">
               {authorizations.map((auth, idx) => (
                 <tr key={auth.address} className="hover:bg-panel-2/50">
+                  <td className="px-3 sm:px-4 py-2.5 font-sans text-ink">
+                    {auth.label ? auth.label : <span className="text-faint">—</span>}
+                  </td>
                   <td className="px-3 sm:px-4 py-2.5 text-ink">
                     {shortAddress(auth.address)}
                   </td>

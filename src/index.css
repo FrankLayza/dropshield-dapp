@@ -42,6 +42,18 @@
   --color-gold-tint: #fff1b8;
   --color-gold-dim: #3d2e00;
 
+  /* ── Violet accent (landing hero, Contiant-style) ──
+     Scoped accent for the marketing hero only — the app's primary action stays
+     ink (--color-iris) and its product accent stays gold. Generates utilities
+     bg-violet / text-violet-deep / border-violet-edge / etc. */
+  --color-violet: #7c3aed;        /* CTA fill, highlight */
+  --color-violet-hover: #6d28d9;  /* CTA hover */
+  --color-violet-deep: #5b21b6;   /* violet text on light */
+  --color-violet-tint: #ede9fe;   /* soft surface wash */
+  --color-violet-edge: #ddd6fe;   /* soft border */
+  --color-violet-line: #c4b5fd;   /* dashed connectors */
+  --color-violet-ink: #3a2a6b;    /* text on violet surfaces */
+
   /* ── Status pairs (bg + text) ── */
   --color-success-bg: #eaf3de;
   --color-success-text: #27500a;
@@ -113,6 +125,34 @@ body {
   outline: 2px solid var(--color-gold);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* ── Link hover: a violet slanted line that ascends into place ──────────── */
+.link-rise {
+  position: relative;
+}
+.link-rise::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 2px;
+  width: 100%;
+  border-radius: 9999px;
+  background: var(--color-violet);
+  /* Draws in from the left like a progress bar filling. */
+  transform: rotate(-2.5deg) scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-rise:hover::after,
+.link-rise:focus-visible::after {
+  transform: rotate(-2.5deg) scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .link-rise::after {
+    transition: transform 0.12s ease;
+  }
 }
 
 /* ── Motion & Custom Gradients ─────────────────────────────────────────── */

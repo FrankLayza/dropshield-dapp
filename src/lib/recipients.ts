@@ -11,6 +11,20 @@ export interface Recipient {
   address: string;
   /** Raw user-entered amount string (whole tokens, may be invalid mid-edit). */
   amount: string;
+  /**
+   * Optional free-text display name (e.g. "Engineering Lead"). Off-chain only —
+   * never sent on-chain; used in the admin tables and the delivered claim links
+   * so a human can tell which allocation belongs to whom.
+   */
+  label?: string;
+}
+
+/** Campaign type — display-only framing; does not change any contract call. */
+export type CampaignType = "payroll" | "investor" | "community";
+
+/** Singular noun for recipients under each campaign type (for UI copy). */
+export function recipientNoun(type: CampaignType): string {
+  return type === "payroll" ? "contributor" : type === "investor" ? "investor" : "recipient";
 }
 
 export interface RecipientIssue {
@@ -77,10 +91,10 @@ export function parseRecipientsCsv(text: string, makeId: () => string): Recipien
   for (const line of lines) {
     const cells = line.split(/[,\t;]/).map((c) => c.trim());
     if (cells.length < 2) continue;
-    const [address, amount] = cells;
-    // Skip a header row like "address,amount"
+    const [address, amount, label] = cells;
+    // Skip a header row like "address,amount,label"
     if (/address/i.test(address) && /amount/i.test(amount)) continue;
-    rows.push({ id: makeId(), address, amount });
+    rows.push({ id: makeId(), address, amount, label: label ?? "" });
   }
   return rows;
 }
