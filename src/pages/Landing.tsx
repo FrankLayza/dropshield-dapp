@@ -109,15 +109,17 @@ export function Landing() {
       </section>
 
       {/* ── TRUST STRIP ──────────────────────────────────────────────────── */}
-      <div className="mt-4 flex flex-col gap-4 border-t border-edge pt-8 sm:flex-row sm:items-center sm:gap-8 lg:mt-8">
-        <span className="max-w-[10rem] text-sm font-medium leading-snug text-mute">
-          Confidential by design.
-          <br />
-          Built on audited infrastructure
-        </span>
-        <div className="flex flex-1 flex-wrap items-center gap-x-8 gap-y-3 sm:justify-around">
+      <div className="mt-10 border-t border-edge pt-8 lg:mt-14">
+        <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-faint">
+          Built on audited, open infrastructure
+        </p>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5">
           {TRUST.map((name) => (
-            <span key={name} className="font-mono text-sm text-faint">
+            <span
+              key={name}
+              className="inline-flex items-center gap-2 rounded-full border border-edge bg-panel/60 px-4 py-1.5 font-mono text-xs text-mute backdrop-blur-sm"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-violet/70" />
               {name}
             </span>
           ))}

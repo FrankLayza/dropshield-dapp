@@ -25,7 +25,7 @@ function NewCampaignButton({ className = "" }: { className?: string }) {
 
 export function Dashboard() {
   const { address, isConnected } = useAccount();
-  const { data: campaigns, isLoading, isError } = useMyCampaigns(address);
+  const { data: campaigns, isLoading, isError, isFetching, refetch } = useMyCampaigns(address);
   const list = campaigns ?? [];
   const { byAddress, totalClaims } = useCampaignClaimCounts(list);
 
@@ -88,8 +88,35 @@ export function Dashboard() {
           </div>
         </div>
       ) : isError ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-danger">
-          Couldn't load campaigns from the network. Check your RPC connection and try again.
+        <div className="rounded-xl border border-red-200 bg-red-50 p-5">
+          <p className="text-sm font-medium text-danger">
+            Couldn't load campaigns from the network.
+          </p>
+          <p className="mt-1 max-w-md text-sm text-danger/80">
+            The RPC endpoint rejected the request — usually a rate limit on a public
+            node. Wait a moment and retry, or switch to a dedicated RPC.
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white transition-all duration-150 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={isFetching ? "animate-spin" : ""}
+            >
+              <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" />
+            </svg>
+            {isFetching ? "Retrying…" : "Try again"}
+          </button>
         </div>
       ) : list.length === 0 ? (
         /* Empty state */

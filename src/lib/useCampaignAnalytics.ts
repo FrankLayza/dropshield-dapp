@@ -54,6 +54,43 @@ const DEFAULT_LOOKBACK_BLOCKS = 500_000n;
 /** Per-request span. 9k fits the common public-RPC getLogs caps. */
 const CHUNK_SPAN = 9_000n;
 
+/**
+ * Public RPCs (publicnode et al.) rate-limit a burst of getLogs with 403/429 or
+ * a timeout. Retry transient failures with exponential backoff so a brief throttle
+ * self-heals instead of failing the whole dashboard. getLogs is a pure read — safe
+ * to retry. Non-transient errors (bad params, range too large) throw immediately.
+ */
+function isTransientRpcError(err: unknown): boolean {
+  const msg = String((err as Error)?.message ?? err).toLowerCase();
+  return (
+    msg.includes("403") ||
+    msg.includes("429") ||
+    msg.includes("forbidden") ||
+    msg.includes("rate limit") ||
+    msg.includes("timeout") ||
+    msg.includes("timed out") ||
+    msg.includes("failed to fetch") ||
+    msg.includes("fetch failed") ||
+    msg.includes("network")
+  );
+}
+
+async function withRetry<T>(fn: () => Promise<T>, attempts = 4, baseDelayMs = 600): Promise<T> {
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (i === attempts - 1 || !isTransientRpcError(err)) throw err;
+      // Exponential backoff with a little jitter to desync concurrent scans.
+      const delay = baseDelayMs * 2 ** i + Math.floor(Math.random() * 250);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw lastErr;
+}
+
 /** Resolve the [fromBlock, latest] window to scan, honoring the env override. */
 async function resolveWindow(client: PublicClient): Promise<[bigint, bigint]> {
   const latest = await client.getBlockNumber();
@@ -81,13 +118,15 @@ async function scanLogs<TEvent extends AbiEvent>(
   const out: LogItem[] = [];
   for (let start = fromBlock; start <= toBlock; start += CHUNK_SPAN + 1n) {
     const end = start + CHUNK_SPAN > toBlock ? toBlock : start + CHUNK_SPAN;
-    const chunk = await client.getLogs({
-      address: filter.address,
-      event: filter.event,
-      args: filter.args,
-      fromBlock: start,
-      toBlock: end,
-    } as Parameters<typeof client.getLogs>[0]);
+    const chunk = await withRetry(() =>
+      client.getLogs({
+        address: filter.address,
+        event: filter.event,
+        args: filter.args,
+        fromBlock: start,
+        toBlock: end,
+      } as Parameters<typeof client.getLogs>[0]),
+    );
     out.push(...(chunk as LogItem[]));
   }
   return out;
