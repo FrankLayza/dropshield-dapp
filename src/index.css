@@ -155,6 +155,51 @@ body {
   }
 }
 
+/* ── Hero floating cards: lift + bring-to-front on hover ──────────────────
+   The wrapper (.hero-card) owns position + GSAP's idle-float transform, so we
+   only touch z-index here — never transform — to avoid fighting GSAP. The
+   lift/scale lives on the inner card element instead. */
+.hero-card {
+  z-index: 1;
+}
+.hero-card:hover {
+  z-index: 40;
+}
+/* Inner card element — the actual visible card. Scale + deepen its shadow. */
+.hero-card > * {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hero-card:hover > * {
+  transform: scale(1.04);
+  box-shadow: 0 32px 70px -22px rgba(40, 24, 80, 0.42);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-card > * {
+    transition: none;
+  }
+  .hero-card:hover > * {
+    transform: none;
+  }
+}
+
+/* ── Custom cursor ────────────────────────────────────────────────────────
+   Inline-SVG cursors (no external asset). The two trailing numbers are the
+   hotspot (x y) — the active pixel — which we center on the ring. A keyword
+   fallback (auto / pointer) is mandatory or browsers ignore the whole rule. */
+body {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='6' fill='none' stroke='%237c3aed' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='1.5' fill='%237c3aed'/%3E%3C/svg%3E") 12 12, auto;
+}
+a,
+button,
+[role="button"],
+label,
+summary,
+.hero-card {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ccircle cx='14' cy='14' r='11' fill='%237c3aed' fill-opacity='0.12' stroke='%237c3aed' stroke-width='2'/%3E%3C/svg%3E") 14 14, pointer;
+}
+
 /* ── Motion & Custom Gradients ─────────────────────────────────────────── */
 
 .mesh-gradient-bg {
@@ -239,4 +284,184 @@ html.lenis {
 }
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* ── FEATURES SECTION ──────────────────────────────────────────────────── */
+.features-section {
+  padding-top: 5rem;
+  padding-bottom: 3rem;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Heading ── */
+.features-heading {
+  text-align: center;
+  max-width: 36rem;
+  margin-inline: auto;
+  margin-bottom: 3.5rem;
+}
+
+.features-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-violet);
+  background: var(--color-violet-tint);
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  margin-bottom: 1rem;
+}
+
+.features-title {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--color-ink);
+}
+@media (min-width: 640px) {
+  .features-title {
+    font-size: 3rem;
+  }
+}
+
+.features-title-accent {
+  color: var(--color-violet);
+}
+
+.features-subtitle {
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-mute);
+  max-width: 30rem;
+  margin-inline: auto;
+}
+
+/* ── Cards Grid ── */
+.features-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  width: 100%;
+  max-width: 72rem; /* 1152px */
+  padding-inline: 1.5rem;
+}
+@media (min-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* ── Individual Card ── */
+.feature-card {
+  position: relative;
+  background: var(--card-bg, var(--color-panel));
+  border-radius: 0.85rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0;
+  overflow: hidden;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 12px 40px -12px rgba(40, 24, 80, 0.1);
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.06),
+    0 20px 60px -16px rgba(40, 24, 80, 0.18);
+}
+
+
+
+/* Number badge */
+.feature-card-number {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--card-accent);
+  opacity: 0.5;
+}
+
+.feature-card-illustration-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: 0;
+  padding: 1.25rem 1.5rem 2rem;
+  background: none;
+}
+
+.feature-card-illustration {
+  width: 5.5rem;
+  height: 5.5rem;
+  object-fit: contain;
+  border-radius: 0.625rem;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.06));
+}
+
+.feature-card-illustration-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.5rem;
+  height: 5.5rem;
+}
+
+/* Content area */
+.feature-card-content {
+  padding: 0 1.5rem 1.75rem;
+}
+
+.feature-card-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--color-ink);
+  line-height: 1.25;
+}
+
+.feature-card-body {
+  margin-top: 0.6rem;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--color-mute);
+}
+
+/* ── Responsive fine-tuning ── */
+@media (max-width: 767px) {
+  .features-section {
+    padding-top: 3rem;
+  }
+  .features-heading {
+    margin-bottom: 2.5rem;
+  }
+  .features-title {
+    font-size: 2rem;
+  }
+  .feature-card-illustration-wrap {
+    min-height: 0;
+  }
 }

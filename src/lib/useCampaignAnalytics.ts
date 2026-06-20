@@ -1,6 +1,6 @@
 import { useQuery, useQueries, type UseQueryResult } from "@tanstack/react-query";
 import { usePublicClient, useChainId } from "wagmi";
-import { parseAbiItem, type Address, type PublicClient } from "viem";
+import { parseAbiItem, type Address, type PublicClient, type AbiEvent } from "viem";
 import { getFheAirdropFactoryAddress } from "@tokenops/sdk";
 import { env } from "@/lib/env";
 import { TOKENOPS_AIRDROP_FACTORY_SEPOLIA } from "@/lib/addresses";
@@ -45,44 +45,52 @@ function resolveFactory(chainId: number): Address {
 }
 
 /**
- * Default block window to scan when VITE_FACTORY_FROM_BLOCK isn't set. Many RPCs
- * (Infura, public/non-archive nodes) reject `eth_getLogs` from block 0 or over a
- * huge range — so we scan a bounded recent window ending at the latest block.
- * ~1M Sepolia blocks ≈ several months, which covers this dApp's whole lifetime.
+ * Default block window to scan when VITE_FACTORY_FROM_BLOCK isn't set. RPCs cap
+ * `eth_getLogs` ranges (Alchemy free ~10 blocks, publicnode 50k, etc.), so we
+ * always chunk — this just bounds how far back we look. ~500k Sepolia blocks ≈
+ * a couple months, covering this dApp's whole lifetime.
  */
 const DEFAULT_LOOKBACK_BLOCKS = 500_000n;
-/** Per-request span for the chunked fallback (≤10k fits most public-RPC getLogs caps). */
+/** Per-request span. 9k fits the common public-RPC getLogs caps. */
 const CHUNK_SPAN = 9_000n;
 
+/** Resolve the [fromBlock, latest] window to scan, honoring the env override. */
+async function resolveWindow(client: PublicClient): Promise<[bigint, bigint]> {
+  const latest = await client.getBlockNumber();
+  const from =
+    env.factoryFromBlock > 0n
+      ? env.factoryFromBlock
+      : latest > DEFAULT_LOOKBACK_BLOCKS
+        ? latest - DEFAULT_LOOKBACK_BLOCKS
+        : 0n;
+  return [from, latest];
+}
+
 /**
- * Fetch the admin's creation logs. Tries one full-range request (fast on Alchemy,
- * which allows wide address-filtered ranges); on failure (range/result caps),
- * falls back to fixed-size chunked scanning so it works on any provider.
+ * Scan `getLogs` for a single event across a block window in fixed-size chunks,
+ * so it works on every RPC regardless of range cap. Generic over the event so
+ * each returned log keeps its decoded `.args`.
  */
-async function getCreatedLogs(
+async function scanLogs<TEvent extends AbiEvent>(
   client: PublicClient,
-  factory: Address,
-  admin: Address,
+  filter: { address: Address; event: TEvent; args?: Record<string, unknown> },
   fromBlock: bigint,
   toBlock: bigint,
 ) {
-  const base = { address: factory, event: confidentialAirdropCreatedEvent, args: { admin } } as const;
-  try {
-    return await client.getLogs({ ...base, fromBlock, toBlock });
-  } catch (err) {
-    console.warn(
-      "[campaigns] full-range getLogs failed; falling back to chunked scan. " +
-        "Set VITE_FACTORY_FROM_BLOCK to the factory deploy block for speed.",
-      err,
-    );
-    const out: Awaited<ReturnType<typeof client.getLogs>> = [];
-    for (let start = fromBlock; start <= toBlock; start += CHUNK_SPAN + 1n) {
-      const end = start + CHUNK_SPAN > toBlock ? toBlock : start + CHUNK_SPAN;
-      const chunk = await client.getLogs({ ...base, fromBlock: start, toBlock: end });
-      out.push(...chunk);
-    }
-    return out;
+  type LogItem = Awaited<ReturnType<typeof client.getLogs<TEvent>>>[number];
+  const out: LogItem[] = [];
+  for (let start = fromBlock; start <= toBlock; start += CHUNK_SPAN + 1n) {
+    const end = start + CHUNK_SPAN > toBlock ? toBlock : start + CHUNK_SPAN;
+    const chunk = await client.getLogs({
+      address: filter.address,
+      event: filter.event,
+      args: filter.args,
+      fromBlock: start,
+      toBlock: end,
+    } as Parameters<typeof client.getLogs>[0]);
+    out.push(...(chunk as LogItem[]));
   }
+  return out;
 }
 
 /**
@@ -100,17 +108,15 @@ export function useMyCampaigns(admin?: string): UseQueryResult<MergedCampaign[],
     enabled: !!publicClient && !!admin,
     staleTime: 30_000,
     queryFn: async () => {
-      const latest = await publicClient!.getBlockNumber();
-      const fromBlock =
-        env.factoryFromBlock > 0n
-          ? env.factoryFromBlock
-          : latest > DEFAULT_LOOKBACK_BLOCKS
-            ? latest - DEFAULT_LOOKBACK_BLOCKS
-            : 0n;
-      const logs = await getCreatedLogs(
-        publicClient! as PublicClient,
-        resolveFactory(chainId),
-        admin as Address,
+      const client = publicClient! as PublicClient;
+      const [fromBlock, latest] = await resolveWindow(client);
+      const logs = await scanLogs(
+        client,
+        {
+          address: resolveFactory(chainId),
+          event: confidentialAirdropCreatedEvent,
+          args: { admin: admin as Address },
+        },
         fromBlock,
         latest,
       );
@@ -159,12 +165,14 @@ export function useClaimCount(
     staleTime: 15_000,
     refetchInterval: active ? 20_000 : false,
     queryFn: async () => {
-      const logs = await publicClient!.getLogs({
-        address: address as Address,
-        event: claimedEvent,
-        fromBlock: fromBlock ?? env.factoryFromBlock,
-        toBlock: "latest",
-      });
+      const client = publicClient! as PublicClient;
+      const latest = await client.getBlockNumber();
+      const logs = await scanLogs(
+        client,
+        { address: address as Address, event: claimedEvent },
+        fromBlock ?? env.factoryFromBlock,
+        latest,
+      );
       return logs.length;
     },
   });
@@ -193,12 +201,14 @@ export function useCampaignClaimCounts(campaigns: MergedCampaign[]): CampaignCla
       staleTime: 15_000,
       refetchInterval: (c.status === "active" ? 20_000 : false) as number | false,
       queryFn: async () => {
-        const logs = await publicClient!.getLogs({
-          address: c.address,
-          event: claimedEvent,
-          fromBlock: c.creationBlock,
-          toBlock: "latest" as const,
-        });
+        const client = publicClient! as PublicClient;
+        const latest = await client.getBlockNumber();
+        const logs = await scanLogs(
+          client,
+          { address: c.address, event: claimedEvent },
+          c.creationBlock,
+          latest,
+        );
         return logs.length;
       },
     })),

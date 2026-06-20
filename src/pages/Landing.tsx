@@ -2,7 +2,7 @@ import { useRef, useLayoutEffect } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { Footer } from "@/components/Footer";
-import { Reveal } from "@/components/Reveal";
+import { Features } from "@/components/Features";
 
 /* ── Contiant-style hero, DropShield content ───────────────────────────────
    Two-column hero: left = headline / subhead / CTA + a bottom trust strip;
@@ -12,21 +12,7 @@ import { Reveal } from "@/components/Reveal";
    orchestrated timeline); Lenis (configured in App.tsx) carries the scroll.
    The violet accent lives in @theme as --color-violet*; global ink/gold stay. */
 
-/* Kept from the previous landing — feature cards below the hero are unchanged. */
-const FEATURES = [
-  {
-    title: "Salary privacy, on-chain",
-    body: "Contributors can't see each other's pay. Competitors can't see your burn rate. Every amount is an FHE ciphertext on-chain — unreadable to everyone, including validators.",
-  },
-  {
-    title: "Verify before you claim",
-    body: "Each recipient decrypts their own allocation and confirms it before signing the claim — and only their own. No trust required; the math is the proof.",
-  },
-  {
-    title: "No roster on-chain",
-    body: "Only contributors who choose to claim ever reveal themselves. Your full payroll list never touches the blockchain.",
-  },
-];
+/* Features data is now in the Features component */
 
 const TRUST = ["Zama Protocol", "TokenOps SDK", "ERC-7984", "FHE"];
 
@@ -138,17 +124,8 @@ export function Landing() {
         </div>
       </div>
 
-      {/* ── FEATURES (unchanged) ─────────────────────────────────────────── */}
-      <Reveal.Stagger className="mt-20 grid gap-px overflow-hidden rounded-lg border border-edge bg-edge sm:grid-cols-3">
-        {FEATURES.map((f) => (
-          <Reveal.Item key={f.title} className="bg-panel p-7">
-            <h3 className="font-display text-lg font-semibold tracking-tight text-ink">
-              {f.title}
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-mute">{f.body}</p>
-          </Reveal.Item>
-        ))}
-      </Reveal.Stagger>
+      {/* ── FEATURES — GSAP scroll-driven section ──────────────────────── */}
+      <Features />
 
       <Footer />
     </div>
@@ -199,23 +176,23 @@ function ClaimFlowCluster() {
           <g fill="none" stroke="var(--color-violet-line)" strokeWidth="1.5" strokeDasharray="5 6">
             <path d="M250 120 C 250 200, 150 200, 150 280" />
             <path d="M395 165 C 460 230, 360 250, 360 300" />
-            <path d="M300 380 C 400 380, 420 360, 430 350" />
+            <path d="M300 380 C 370 360, 330 330, 322 305" />
           </g>
         </svg>
 
-        <div className="js-card absolute left-0 top-10 w-48">
+        <div className="js-card hero-card absolute left-0 top-6 w-44">
           <RecipientCard />
         </div>
-        <div className="js-card absolute left-40 top-0 w-60">
+        <div className="js-card hero-card absolute left-40 top-0 w-60">
           <AllocationCard />
         </div>
-        <div className="js-card absolute right-0 top-8 w-44">
+        <div className="js-card hero-card absolute right-0 top-8 w-44">
           <ProofCard />
         </div>
-        <div className="js-card absolute left-8 top-72 w-72">
+        <div className="js-card hero-card absolute left-8 top-72 w-72">
           <AuthorizeCard />
         </div>
-        <div className="js-card absolute bottom-2 right-4 w-44">
+        <div className="js-card hero-card absolute right-0 top-[300px] w-44">
           <ClaimedCard />
         </div>
       </div>
@@ -231,10 +208,16 @@ function RecipientCard() {
   return (
     <div className={CARD + " overflow-hidden p-3"}>
       <div
-        className="flex h-32 w-full items-end rounded-xl p-2.5"
+        className="relative h-44 w-full overflow-hidden rounded-xl"
         style={{ background: "linear-gradient(140deg,var(--color-violet-tint),var(--color-violet-line))" }}
       >
-        <span className="rounded-lg bg-white px-2.5 py-1 text-xs shadow-sm">
+        <img
+          src="/illustrations/mara.png"
+          alt="Mara, recipient"
+          className="absolute inset-x-0 bottom-0 mx-auto h-[92%] w-auto object-contain object-bottom"
+          loading="lazy"
+        />
+        <span className="absolute bottom-2.5 left-2.5 rounded-lg bg-white/95 px-2.5 py-1 text-xs shadow-sm backdrop-blur-sm">
           <span className="block font-semibold text-ink">Mara</span>
           <span className="block text-[10px] text-mute">eng. lead</span>
         </span>

@@ -18,7 +18,7 @@ export function App() {
         <SpeedInsights />
         {/* ── Top navbar (Contiant-style: wordmark left, links + action right) ── */}
         <header className="sticky top-0 z-20 bg-bg/70 backdrop-blur-md">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
             {/* Wordmark — far left */}
             <Link
               to="/"
@@ -43,7 +43,7 @@ export function App() {
           </div>
         </header>
 
-        <main className="mx-auto max-w-5xl px-6 pb-16 pt-3">
+        <main className="mx-auto max-w-6xl px-6 pb-16 pt-3">
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/admin" element={<Dashboard />} />
