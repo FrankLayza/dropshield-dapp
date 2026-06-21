@@ -76,7 +76,7 @@ export function StepDeliver({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `dropshield-airdrop-${campaignAddress.slice(0, 8)}.json`;
+    a.download = `enveil-airdrop-${campaignAddress.slice(0, 8)}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

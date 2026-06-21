@@ -11,10 +11,10 @@ import { env } from "@/lib/env";
  * Coinbase, Rainbow, injected, …) from a single WalletConnect projectId.
  */
 export const wagmiConfig = getDefaultConfig({
-  appName: "DropShield",
+  appName: "Enveil",
   // A placeholder keeps dev working without WalletConnect; injected wallets
   // (MetaMask) still connect. Set VITE_WALLETCONNECT_PROJECT_ID for full support.
-  projectId: env.walletConnectProjectId || "DROPSHIELD_DEV_PLACEHOLDER",
+  projectId: env.walletConnectProjectId || "ENVEIL_DEV_PLACEHOLDER",
   chains: [sepolia],
   transports: {
     [sepolia.id]: http(env.rpcUrl || undefined),

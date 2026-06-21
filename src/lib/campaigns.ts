@@ -12,7 +12,7 @@ import type { CampaignType } from "@/lib/recipients";
  * dashboard still renders from on-chain data alone if this layer is empty.
  */
 
-const STORE_KEY = "dropshield.campaigns.v1";
+const STORE_KEY = "enveil.campaigns.v1";
 
 export interface StoredCampaign {
   /** Lowercased clone address — primary key. */

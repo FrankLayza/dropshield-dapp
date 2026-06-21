@@ -25,8 +25,8 @@ export function App() {
               className="flex items-center gap-2.5 transition-opacity duration-150 hover:opacity-80"
             >
               <Shield size={20} />
-              <span className="font-wordmark text-base lowercase tracking-tight text-ink sm:text-lg">
-                dropshield
+              <span className="font-wordmark text-base lowercase tracking-wider text-ink sm:text-lg">
+                enveil
               </span>
             </Link>
 

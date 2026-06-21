@@ -16,7 +16,7 @@ export function Footer() {
             <div className="flex items-center gap-2.5">
               <Shield size={18} />
               <span className="font-wordmark text-base lowercase tracking-tight text-ink">
-                dropshield
+                enveil
               </span>
             </div>
             <p className="text-xs text-mute mt-1.5 leading-relaxed max-w-xs">
@@ -49,7 +49,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-6 text-xs text-faint">
-          © {new Date().getFullYear()} DropShield Protocol. Built under Zama Developer Program.
+          © {new Date().getFullYear()} Enveil Protocol. Built under Zama Developer Program.
         </div>
 
       </div>
