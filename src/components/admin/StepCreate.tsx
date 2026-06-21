@@ -138,7 +138,7 @@ export function StepCreate({
               onChange={(e) => setTokenAddress(e.target.value)}
               placeholder="0x..."
               spellCheck={false}
-              className="w-full rounded-lg border border-edge-strong bg-transparent px-3 py-2 text-sm font-mono focus:outline-none"
+              className="w-full rounded-lg border border-edge-strong bg-panel px-3 py-2.5 text-sm font-mono text-ink placeholder:text-faint transition-colors duration-150 focus:border-ink focus:outline-none focus:ring-2 focus:ring-gold/40"
             />
             {isMockToken && (
               <span className="absolute right-3 top-2.5 rounded bg-gold/15 px-1.5 py-0.5 text-[10px] font-medium text-gold-dim">
@@ -158,7 +158,7 @@ export function StepCreate({
               type="datetime-local"
               value={startStr}
               onChange={(e) => setStartStr(e.target.value)}
-              className="w-full rounded-lg border border-edge-strong bg-transparent px-3 py-2 text-sm focus:outline-none"
+              className="w-full rounded-lg border border-edge-strong bg-panel px-3 py-2.5 text-sm text-ink transition-colors duration-150 focus:border-ink focus:outline-none focus:ring-2 focus:ring-gold/40"
             />
           </div>
           <div>
@@ -169,7 +169,7 @@ export function StepCreate({
               type="datetime-local"
               value={endStr}
               onChange={(e) => setEndStr(e.target.value)}
-              className="w-full rounded-lg border border-edge-strong bg-transparent px-3 py-2 text-sm focus:outline-none"
+              className="w-full rounded-lg border border-edge-strong bg-panel px-3 py-2.5 text-sm text-ink transition-colors duration-150 focus:border-ink focus:outline-none focus:ring-2 focus:ring-gold/40"
             />
           </div>
         </div>

@@ -137,6 +137,25 @@ export function StepAuthorize({
         </p>
       </div>
 
+      {/* Progress summary */}
+      <div>
+        <div className="mb-1.5 flex items-center justify-between text-xs">
+          <span className="font-medium text-mute">
+            <span className="font-mono text-ink">{completedCount}</span> of{" "}
+            <span className="font-mono text-ink">{recipients.length}</span> authorized
+          </span>
+          {isRunning && <span className="text-gold-dim">working…</span>}
+        </div>
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-gold-tint">
+          <div
+            className="h-full rounded-full bg-gold transition-[width] duration-500 ease-out"
+            style={{
+              width: recipients.length ? `${(completedCount / recipients.length) * 100}%` : "0%",
+            }}
+          />
+        </div>
+      </div>
+
       {/* Recipient Status Table */}
       <div className="max-h-72 overflow-y-auto overflow-x-auto border border-edge rounded-xl bg-panel">
         <table className="w-full text-left text-sm min-w-[340px]">
@@ -168,15 +187,19 @@ export function StepAuthorize({
                       </span>
                     )}
                     {status === "signing" && (
-                      <span className="text-amber-600 font-medium animate-pulse">
+                      <span className="text-warning-text font-medium animate-pulse">
                         Sign in wallet...
                       </span>
                     )}
                     {status === "done" && (
-                      <span className="text-emerald-600 font-medium">✓ Ready</span>
+                      <span className="inline-flex items-center justify-end gap-1 font-medium text-success-text">
+                        <MiniCheck /> Ready
+                      </span>
                     )}
                     {status === "failed" && (
-                      <span className="text-danger font-medium">✗ Failed</span>
+                      <span className="inline-flex items-center justify-end gap-1 font-medium text-danger">
+                        <MiniX /> Failed
+                      </span>
                     )}
                   </td>
                 </tr>
@@ -222,5 +245,20 @@ export function StepAuthorize({
         )}
       </div>
     </div>
+  );
+}
+
+function MiniCheck() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+function MiniX() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
   );
 }

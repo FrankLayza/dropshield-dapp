@@ -86,8 +86,8 @@ export function StepDeliver({
   return (
     <div className="animate-step-in space-y-6">
       <div className="text-center py-4">
-        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 mb-3">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-success-bg text-success-text">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6 9 17l-5-5" />
           </svg>
         </span>

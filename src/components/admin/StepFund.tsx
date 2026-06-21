@@ -193,53 +193,88 @@ export function StepFund({
         </div>
       )}
 
-      <div className="space-y-4">
-        {/* Step 3.1: Approve Operator */}
-        <div className={`rounded-xl border p-5 transition-all ${isApproveDone ? "border-edge bg-panel opacity-60" : "border-gold/30 bg-gold/5"}`}>
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="font-semibold text-sm text-ink">Step 1: Approve Factory</h3>
-              <p className="text-xs text-mute mt-0.5">
-                Authorizes the TokenOps factory to move your confidential tokens (runs setOperator).
-              </p>
-            </div>
-            {isApproveDone && (
-              <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                ✓ Approved
-              </span>
-            )}
-          </div>
-          {!isApproveDone && (
-            <button
-              onClick={handleApprove}
-              disabled={isApprovePending || isApproveConfirming}
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-iris px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-iris-dim disabled:opacity-50"
+      {/* Two-part funding sequence. Marker is a small circle (distinct from the
+          page Stepper) so it reads as a sub-task, not a competing stepper. */}
+      <div className="space-y-3">
+        {/* Approve */}
+        <div
+          className={
+            "rounded-xl border p-4 transition-all duration-200 " +
+            (isApproveDone ? "border-edge bg-panel-2/60" : "border-gold/40 bg-gold/5")
+          }
+        >
+          <div className="flex items-start gap-3">
+            <span
+              className={
+                "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold " +
+                (isApproveDone ? "border-iris bg-iris text-white" : "border-gold bg-gold/10 text-gold-dim")
+              }
             >
-              {isApprovePending ? "Approve in wallet..." : isApproveConfirming ? "Confirming tx..." : "Approve Factory"}
-            </button>
-          )}
+              {isApproveDone ? <MiniCheck /> : "1"}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-semibold text-ink">Approve token transfer</h3>
+                {isApproveDone && (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-success-bg px-2 py-0.5 text-xs font-semibold text-success-text">
+                    <MiniCheck /> Approved
+                  </span>
+                )}
+              </div>
+              <p className="mt-0.5 text-xs text-mute">
+                Authorizes the TokenOps factory to move your confidential tokens (setOperator).
+              </p>
+              {!isApproveDone && (
+                <button
+                  onClick={handleApprove}
+                  disabled={isApprovePending || isApproveConfirming}
+                  className="mt-3 inline-flex items-center gap-2 rounded-lg bg-iris px-4 py-2 text-xs font-semibold text-white transition-all duration-150 hover:bg-iris-dim disabled:opacity-50"
+                >
+                  {isApprovePending ? "Approve in wallet…" : isApproveConfirming ? "Confirming…" : "Approve"}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Step 3.2: Deposit Funds */}
-        <div className={`rounded-xl border p-5 transition-all ${isApproveDone ? "border-gold/30 bg-gold/5" : "border-edge bg-panel opacity-40 pointer-events-none"}`}>
-          <h3 className="font-semibold text-sm text-ink">Step 2: Deposit and Encrypt</h3>
-          <p className="text-xs text-mute mt-0.5">
-            Encrypts the allocation pool on-chain and deposits it into the campaign clone contract.
-          </p>
-
-          {isApproveDone && (
-            <button
-              onClick={handleFund}
-              disabled={fundMutation.isPending}
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-iris px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-iris-dim disabled:opacity-50"
+        {/* Deposit */}
+        <div
+          className={
+            "rounded-xl border p-4 transition-all duration-200 " +
+            (isApproveDone
+              ? "border-gold/40 bg-gold/5"
+              : "border-edge bg-panel-2/40 opacity-50 pointer-events-none")
+          }
+        >
+          <div className="flex items-start gap-3">
+            <span
+              className={
+                "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold " +
+                (isApproveDone ? "border-gold bg-gold/10 text-gold-dim" : "border-edge-strong text-faint")
+              }
             >
-              {retryNotice
-                ? "Retrying encryption…"
-                : fundMutation.isPending
-                  ? "Encrypting & Funding..."
-                  : "Fund Campaign"}
-            </button>
-          )}
+              2
+            </span>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-semibold text-ink">Deposit &amp; encrypt</h3>
+              <p className="mt-0.5 text-xs text-mute">
+                Encrypts the allocation pool on-chain and deposits it into the campaign clone contract.
+              </p>
+              {isApproveDone && (
+                <button
+                  onClick={handleFund}
+                  disabled={fundMutation.isPending}
+                  className="mt-3 inline-flex items-center gap-2 rounded-lg bg-iris px-4 py-2 text-xs font-semibold text-white transition-all duration-150 hover:bg-iris-dim disabled:opacity-50"
+                >
+                  {retryNotice
+                    ? "Retrying encryption…"
+                    : fundMutation.isPending
+                      ? "Encrypting & funding…"
+                      : "Fund campaign"}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -266,5 +301,13 @@ export function StepFund({
         </button>
       </div>
     </div>
+  );
+}
+
+function MiniCheck() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
   );
 }
