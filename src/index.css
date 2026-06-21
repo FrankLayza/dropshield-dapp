@@ -286,6 +286,34 @@ html.lenis {
   pointer-events: none;
 }
 
+/* ── WIPE-UP REVEAL ────────────────────────────────────────────────────────
+   Pure-CSS scroll reveal: the hero is `position: sticky` so it holds at the top
+   while the Features panel — opaque, higher z-index — slides up over it on plain
+   (Lenis-smoothed) scroll. No ScrollTrigger pin, so no consumed scroll / freeze;
+   the transition stays continuous, as if scrolling normally.
+
+   .reveal is the sticky containing block (hero + panel only, NOT the footer), so
+   the hero releases exactly at the panel's bottom and never floats over the
+   footer. Desktop + no-reduced-motion only; below that it's a normal stack. */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .reveal-hero {
+    position: sticky;
+    top: 4rem; /* sit just below the sticky navbar when held */
+    z-index: 0;
+  }
+  .reveal-panel {
+    position: relative;
+    z-index: 2; /* paint over the sticky hero */
+  }
+  /* The rising panel reads as an opaque sheet with a rounded lip + cast shadow. */
+  .reveal-panel .features-section {
+    background: var(--color-bg);
+    border-top-left-radius: 1.5rem;
+    border-top-right-radius: 1.5rem;
+    box-shadow: 0 -22px 50px -24px rgba(40, 24, 80, 0.22);
+  }
+}
+
 /* ── FEATURES SECTION ──────────────────────────────────────────────────── */
 .features-section {
   padding-top: 5rem;

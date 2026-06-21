@@ -19,6 +19,12 @@ const TRUST = ["Zama Protocol", "TokenOps SDK", "ERC-7984", "FHE"];
 export function Landing() {
   const heroRef = useRef<HTMLElement>(null);
 
+  // The wipe-up reveal is pure CSS now (see .reveal-hero / .reveal-panel in
+  // index.css): the hero is `position: sticky` and the Features panel slides
+  // up over it on native, Lenis-smoothed scroll. No ScrollTrigger pin — pinning
+  // consumed a viewport of scroll before the wipe started, which read as the
+  // hero "freezing" mid-scroll. Sticky overlap stays continuous and smooth.
+
   // GSAP entrance timeline + idle float, scoped to the hero. useLayoutEffect so
   // the from-state is set before paint (no flash). Honors reduced-motion.
   useLayoutEffect(() => {
@@ -53,6 +59,11 @@ export function Landing() {
 
   return (
     <div className="relative">
+      {/* ── Reveal stage: containing block that bounds the sticky hero so it
+           releases exactly at the panel's end (never floats over the footer). ── */}
+      <div className="reveal">
+      {/* ── Sticky base: hero + trust strip get covered by the rising panel ── */}
+      <div className="reveal-hero">
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section
         ref={heroRef}
@@ -125,9 +136,15 @@ export function Landing() {
           ))}
         </div>
       </div>
+      </div>
+      {/* ── /reveal-hero ──────────────────────────────────────────────────── */}
 
-      {/* ── FEATURES — GSAP scroll-driven section ──────────────────────── */}
-      <Features />
+      {/* ── FEATURES — slides up over the sticky hero ──────────────────────── */}
+      <div className="reveal-panel">
+        <Features revealMode />
+      </div>
+      </div>
+      {/* ── /reveal stage ─────────────────────────────────────────────────── */}
 
       <Footer />
     </div>

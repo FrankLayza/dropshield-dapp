@@ -36,7 +36,7 @@ const FEATURES = [
 ];
 
 /* ── Features Section ─────────────────────────────────────────────────────── */
-export function Features() {
+export function Features({ revealMode = false }: { revealMode?: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
 
   // Sync Lenis' smooth scroll position into ScrollTrigger on every frame, so the
@@ -55,6 +55,13 @@ export function Features() {
         (context) => {
           const { reduceMotion, isDesktop } = context.conditions!;
           if (reduceMotion) return;
+
+          // On the landing page (desktop), this section is the rising panel of a
+          // wipe-up reveal — the wipe IS its entrance. Its own scroll-triggered
+          // reveals/parallax would fight the panel's transform, so skip them and
+          // let the content render static inside the moving sheet. (Mobile keeps
+          // the normal entrance animations since the wipe is disabled there.)
+          if (revealMode && isDesktop) return;
 
           /* Header: eyebrow → title → subtitle rise in on enter. */
           gsap.from(".js-features-header > *", {
