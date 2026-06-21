@@ -71,7 +71,7 @@ export function Landing() {
       >
         {/* Left column */}
         <div>
-          <h1 className="js-title max-w-2xl font-display text-5xl font-extrabold leading-[1.02] tracking-[-0.02em] sm:text-6xl lg:text-[4.25rem]">
+          <h1 className="js-title max-w-2xl font-display text-[2.125rem] font-extrabold leading-[1.05] tracking-[-0.02em] sm:text-5xl md:text-6xl lg:text-[4.25rem]">
             <span className="text-violet">Private payroll</span>
             <br />
             <span className="text-ink">for </span>
@@ -81,20 +81,20 @@ export function Landing() {
             </span>
           </h1>
 
-          <p className="js-sub mt-6 max-w-md text-base leading-relaxed text-mute">
+          <p className="js-sub mt-5 max-w-md text-base leading-relaxed text-mute sm:mt-6">
             Pay your team in confidential ERC-7984 tokens — every amount encrypted on-chain.
             Contributors verify and claim only their own. Nobody else sees what anyone earns.
           </p>
 
-          <div className="js-cta mt-9 flex flex-wrap items-center gap-4">
+          <div className="js-cta mt-7 flex flex-wrap items-center gap-3 sm:mt-9 sm:gap-4">
             <Link
               to="/admin"
-              className="group inline-flex items-center gap-3 rounded-full bg-violet px-7 py-4 text-base font-semibold text-white shadow-lg shadow-violet/25 transition-all duration-150 hover:-translate-y-0.5 hover:bg-violet-hover"
+              className="group inline-flex items-center gap-2.5 rounded-full bg-violet px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet/25 transition-all duration-150 hover:-translate-y-0.5 hover:bg-violet-hover sm:px-7 sm:py-3.5 sm:text-base"
             >
               Create a campaign
               <svg
-                width="20"
-                height="20"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -108,7 +108,7 @@ export function Landing() {
             </Link>
             <Link
               to="/claim"
-              className="link-rise text-base font-semibold text-ink transition-colors duration-150 hover:text-violet-deep"
+              className="inline-flex items-center gap-2 rounded-full border border-violet/25 bg-white/70 px-5 py-3 text-sm font-semibold text-violet-deep backdrop-blur-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-violet/40 hover:bg-white sm:px-6 sm:py-3.5 sm:text-base"
             >
               Claim your payment
             </Link>
@@ -178,9 +178,10 @@ function UnderlineSquiggle() {
 function ClaimFlowCluster() {
   return (
     <div className="relative">
-      {/* Mobile: a single representative card (cluster is lg-only). */}
-      <div className="js-card lg:hidden">
-        <AllocationCard />
+      {/* Mobile: one cohesive preview card telling the claim story end-to-end
+          (the desktop constellation below is lg-only). */}
+      <div className="js-card mx-auto w-full max-w-sm lg:hidden">
+        <MobileClaimPreview />
       </div>
 
       {/* Desktop: full constellation */}
@@ -215,6 +216,56 @@ function ClaimFlowCluster() {
           <ClaimedCard />
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ── Mobile hero visual ─────────────────────────────────────────────────────
+   On phones the floating constellation collapses to one self-contained card
+   that tells the whole story: who's paid → masked allocation → decrypt. */
+function MobileClaimPreview() {
+  return (
+    <div className={CARD + " p-4"}>
+      {/* Recipient */}
+      <div className="flex items-center gap-3">
+        <span
+          className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full"
+          style={{ background: "linear-gradient(140deg,var(--color-violet-tint),var(--color-violet-line))" }}
+        >
+          <img
+            src="/illustrations/mara.png"
+            alt="Mara, recipient"
+            className="absolute inset-0 h-full w-full object-cover object-top"
+            loading="lazy"
+          />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-ink">Mara</p>
+          <p className="text-xs text-mute">eng. lead</p>
+        </div>
+        <span className="ml-auto shrink-0 rounded-full bg-violet-tint/60 px-2.5 py-1 text-[11px] font-medium text-violet-deep">
+          Q2 Payroll
+        </span>
+      </div>
+
+      {/* Masked allocation */}
+      <div className="mt-4 rounded-xl border border-violet-line/60 bg-violet-tint/30 px-4 py-3.5 text-center">
+        <p className="text-xs font-medium text-mute">Your allocation</p>
+        <p className="mt-1 font-mono text-2xl font-semibold tracking-widest text-faint select-none">
+          •••••• <span className="text-sm tracking-normal">tokens</span>
+        </p>
+      </div>
+
+      {/* Action */}
+      <button
+        type="button"
+        className="mt-3 w-full rounded-full bg-ink py-3 text-xs font-semibold uppercase tracking-wider text-white"
+      >
+        Decrypt &amp; verify
+      </button>
+      <p className="mt-2.5 text-center text-[11px] text-faint">
+        Encrypted on-chain · only you can decrypt
+      </p>
     </div>
   );
 }

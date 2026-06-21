@@ -109,9 +109,13 @@ export function StepAuthorize({
         console.error(`Failed at recipient ${recipient.address}`, err);
         newStatuses[recipient.id] = "failed";
         setStatuses({ ...newStatuses });
+        const msg = (err?.message ?? String(err)) + " " + (err?.cause?.message ?? "");
+        const transient = /timed out|fetch|relayer|network|ENCRYPT|worker|ECONNRESET|ETIMEDOUT/i.test(msg);
         setErrorMsg(
-          err?.message ||
-            `Failed to authorize recipient ${shortAddress(recipient.address)}. Please try again.`
+          transient
+            ? `The Zama relayer stalled on ${shortAddress(recipient.address)}. Already-done recipients are saved — click “Resume authorizations” to continue.`
+            : err?.message ||
+                `Failed to authorize recipient ${shortAddress(recipient.address)}. Please try again.`,
         );
         setIsRunning(false);
         return;

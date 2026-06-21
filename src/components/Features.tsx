@@ -159,6 +159,7 @@ export function Features({ revealMode = false }: { revealMode?: boolean }) {
                   alt={feature.title}
                   className="js-feature-illustration feature-card-illustration"
                   loading="lazy"
+                  width={50}
                 />
               </div>
 

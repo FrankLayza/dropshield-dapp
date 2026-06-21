@@ -6,5 +6,13 @@ import { ConnectButton as RainbowConnectButton } from "@rainbow-me/rainbowkit";
  * network switching, and disconnect.
  */
 export function ConnectButton() {
-  return <RainbowConnectButton showBalance={false} accountStatus="address" chainStatus="icon" />;
+  return (
+    <RainbowConnectButton
+      showBalance={false}
+      // Compact on phones (avatar only) so the address can't wrap the navbar;
+      // full address on larger screens.
+      accountStatus={{ smallScreen: "avatar", largeScreen: "address" }}
+      chainStatus={{ smallScreen: "none", largeScreen: "icon" }}
+    />
+  );
 }

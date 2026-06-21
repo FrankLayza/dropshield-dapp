@@ -75,7 +75,9 @@ export function ConfidentialBalance({ tokenAddress }: { tokenAddress?: `0x${stri
             </div>
           ) : balanceQuery.isError ? (
             <p className="text-xs text-danger">
-              {balanceQuery.error?.message || "Could not decrypt balance."}
+              {/timed out|fetch|relayer|network|worker/i.test(balanceQuery.error?.message || "")
+                ? "The Zama relayer is slow right now. Click Retry in a moment."
+                : balanceQuery.error?.message || "Could not decrypt balance."}
             </p>
           ) : (
             <div className="flex items-baseline gap-2">

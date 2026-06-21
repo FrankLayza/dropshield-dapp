@@ -17,7 +17,7 @@ const fmtFull = (ts: number) =>
 export function CampaignDetail() {
   const { address: param } = useParams();
   const { address: admin, isConnected } = useAccount();
-  const { data: campaigns, isLoading } = useMyCampaigns(admin);
+  const { data: campaigns, isLoading, isError, isFetching, refetch } = useMyCampaigns(admin);
 
   const campaign = (campaigns ?? []).find(
     (c) => c.address.toLowerCase() === param?.toLowerCase(),
@@ -51,6 +51,44 @@ export function CampaignDetail() {
       <div className="mx-auto max-w-2xl">
         {back}
         <div className="h-64 animate-pulse rounded-2xl border border-edge bg-panel-2" />
+      </div>
+    );
+  }
+
+  // Network/RPC failure — distinct from "not found" so the admin doesn't think
+  // their campaign vanished when it's really a rate-limited public node.
+  if (isError) {
+    return (
+      <div className="mx-auto max-w-2xl">
+        {back}
+        <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-6">
+          <h2 className="text-sm font-semibold text-danger">Couldn't load this campaign</h2>
+          <p className="mt-1 max-w-md text-sm text-danger/80">
+            The RPC endpoint rejected the request — usually a rate limit on a public
+            node. Wait a moment and retry, or switch to a dedicated RPC.
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white transition-all duration-150 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={isFetching ? "animate-spin" : ""}
+            >
+              <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" />
+            </svg>
+            {isFetching ? "Retrying…" : "Try again"}
+          </button>
+        </div>
       </div>
     );
   }

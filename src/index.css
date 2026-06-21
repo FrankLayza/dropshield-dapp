@@ -146,7 +146,8 @@ body {
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .link-rise:hover::after,
-.link-rise:focus-visible::after {
+.link-rise:focus-visible::after,
+.link-rise[aria-current="page"]::after {
   transform: rotate(-2.5deg) scaleX(1);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -402,6 +403,25 @@ html.lenis {
   .feature-card--featured {
     grid-row: span 2;
   }
+  /* The featured card only earns its larger type + illustration on desktop,
+     where it's a tall 2-row cell. On mobile every card is equal, so these live
+     here (out of the base rules) — keeps all three cards pixel-identical on
+     phones. The cipher cue also only shows on the desktop featured card. */
+  .feature-card--featured .feature-card-illustration {
+    width: 6rem;
+    height: 6rem;
+  }
+  .feature-card--featured .feature-card-title {
+    font-size: 1.6rem;
+  }
+  .feature-card--featured .feature-card-body {
+    font-size: 0.98rem;
+    max-width: 26rem;
+  }
+  .feature-card-cipher {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 /* ── Individual card — carries its own soft color (the palette you liked) ── */
@@ -475,11 +495,6 @@ html.lenis {
   filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.1));
 }
 
-.feature-card--featured .feature-card-illustration {
-  width: 6rem;
-  height: 6rem;
-}
-
 .feature-card-illustration-placeholder {
   display: flex;
   align-items: center;
@@ -502,10 +517,6 @@ html.lenis {
   line-height: 1.25;
 }
 
-.feature-card--featured .feature-card-title {
-  font-size: 1.6rem;
-}
-
 /* Body text darkened for AA contrast on the tinted card backgrounds. */
 .feature-card-body {
   margin-top: 0.6rem;
@@ -514,13 +525,11 @@ html.lenis {
   color: rgba(26, 26, 24, 0.68);
 }
 
-.feature-card--featured .feature-card-body {
-  font-size: 0.98rem;
-  max-width: 26rem;
-}
-
-/* Featured-card cipher cue — pushed to the bottom to fill the tall cell. */
+/* Featured-card cipher cue — pushed to the bottom to fill the tall cell.
+   Hidden on mobile (where the featured card is just a normal card) and shown
+   in the desktop media query above, so all three mobile cards stay uniform. */
 .feature-card-cipher {
+  display: none;
   margin-top: auto;
   padding-top: 1.75rem;
 }

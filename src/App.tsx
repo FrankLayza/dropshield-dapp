@@ -18,7 +18,7 @@ export function App() {
         <SpeedInsights />
         {/* ── Top navbar (Contiant-style: wordmark left, links + action right) ── */}
         <header className="sticky top-0 z-30 border-b border-edge/60 bg-bg/80 backdrop-blur-md">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
             {/* Wordmark — far left */}
             <Link
               to="/"
@@ -31,20 +31,20 @@ export function App() {
             </Link>
 
             {/* Links + action — far right */}
-            <nav className="flex items-center gap-1 sm:gap-2">
+            <nav className="flex items-center gap-4 sm:gap-5">
               <NavLink to="/admin" active={pathname.startsWith("/admin")}>
                 Create
               </NavLink>
               <NavLink to="/claim" active={pathname.startsWith("/claim")}>
                 Claim
               </NavLink>
-              <span className="mx-1.5 hidden h-5 w-px bg-edge sm:block" aria-hidden />
+              <span className="hidden h-5 w-px bg-edge sm:block" aria-hidden />
               <ConnectButton />
             </nav>
           </div>
         </header>
 
-        <main className="mx-auto max-w-6xl px-6 pb-16 pt-3">
+        <main className="mx-auto max-w-6xl px-4 pb-16 pt-3 sm:px-6">
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/admin" element={<Dashboard />} />
@@ -60,7 +60,8 @@ export function App() {
   );
 }
 
-/** Top-nav text link — Contiant-style: plain, medium-weight, gray→ink on hover. */
+/** Top-nav text link — plain text with the slant-underline hover (.link-rise).
+    Active route keeps the underline drawn (see `.link-rise[aria-current]` in CSS). */
 function NavLink({
   to,
   active,
@@ -75,10 +76,8 @@ function NavLink({
       to={to}
       aria-current={active ? "page" : undefined}
       className={
-        "rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 " +
-        (active
-          ? "bg-violet-tint text-violet-deep"
-          : "text-mute hover:bg-panel-2 hover:text-ink")
+        "link-rise py-1 text-sm font-medium transition-colors duration-150 " +
+        (active ? "text-violet-deep" : "text-mute hover:text-ink")
       }
     >
       {children}

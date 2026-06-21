@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAccount, useChainId, useWriteContract, useWaitForTransactionReceipt, useBalance } from "wagmi";
 import { formatEther } from "viem";
 import { getFheAirdropFactoryAddress } from "@tokenops/sdk";
@@ -65,9 +65,27 @@ export function StepFund({
 
   // Operator approval
   const { writeContractAsync: approveOperator, isPending: isApprovePending } = useWriteContract();
-  const { isLoading: isApproveConfirming, isSuccess: isApproveSuccess } = useWaitForTransactionReceipt({
-    hash: approveTxHash,
-  });
+  const {
+    isLoading: isApproveConfirming,
+    data: approveReceipt,
+    isError: isApproveReceiptError,
+  } = useWaitForTransactionReceipt({ hash: approveTxHash });
+
+  // useWaitForTransactionReceipt resolves successfully even when the tx REVERTED
+  // (status: "reverted") — so gate "done" on the receipt status, not just on the
+  // query succeeding. A reverted approval must NOT unlock the deposit step.
+  const approveReverted = approveReceipt?.status === "reverted";
+
+  // Surface a reverted / failed approval and let the user re-approve (clearing the
+  // hash brings the Approve button back).
+  useEffect(() => {
+    if (approveReverted || isApproveReceiptError) {
+      setErrorMsg(
+        "The approval transaction failed on-chain. Check your token balance/network and approve again.",
+      );
+      setApproveTxHash(undefined);
+    }
+  }, [approveReverted, isApproveReceiptError]);
 
   // Funding mutation
   const fundMutation = useFundConfidentialAirdrop({
@@ -153,7 +171,8 @@ export function StepFund({
     }
   };
 
-  const isApproveDone = isApproveSuccess || !!approveTxHash && !isApprovePending && !isApproveConfirming;
+  // Only a confirmed-successful receipt counts as done.
+  const isApproveDone = approveReceipt?.status === "success";
 
   return (
     <div className="animate-step-in space-y-6">

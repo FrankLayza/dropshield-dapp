@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, useReducedMotion, useMotionValue, animate } from "framer-motion";
-import { useAccount } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
+import { formatEther } from "viem";
 import { useUserDecrypt } from "@zama-fhe/react-sdk";
 import {
   useGetClaimAmount,
@@ -10,8 +11,24 @@ import {
 import { formatTokens, shortAddress, TOKEN_DECIMALS } from "@/lib/recipients";
 import { ConfidentialBalance } from "@/components/ConfidentialBalance";
 
+// The Zama relayer and Sepolia RPC intermittently time out / fetch-fail. These
+// are transient and deserve a calm "try again" rather than a raw stack trace.
+// Used for both the reveal (getClaimAmount) and decrypt (userDecrypt) steps.
+const isTransientRelayerError = (msg: string) =>
+  /timed out|fetch|relayer|network|ENCRYPT|worker|NODE_INIT|ECONNRESET|ETIMEDOUT/i.test(
+    msg,
+  );
+
+const LOW_ETH_THRESHOLD = 5_000_000_000_000_000n; // 0.005 ETH in wei
+
 export function Claim() {
   const { address: connectedAddress, isConnected } = useAccount();
+
+  // Recipient gas balance — claiming is an on-chain tx (plus an auto-attached
+  // gas fee), so a recipient with no Sepolia ETH would hit a confusing revert.
+  const { data: ethBalance } = useBalance({ address: connectedAddress });
+  const isLowEth =
+    isConnected && ethBalance !== undefined && ethBalance.value < LOW_ETH_THRESHOLD;
 
   // Payload inputs
   const [campaignAddress, setCampaignAddress] = useState("");
@@ -181,7 +198,7 @@ export function Claim() {
     if (!decryptQuery.error) return;
     const msg = decryptQuery.error.message || "";
     setErrorMsg(
-      /timed out|fetch|relayer|network|ENCRYPT|worker/i.test(msg)
+      isTransientRelayerError(msg)
         ? "The Zama relayer is unresponsive right now. Wait a moment and click Decrypt again."
         : msg || "Decryption failed.",
     );
@@ -208,7 +225,12 @@ export function Claim() {
       setRevealHandle(result.handle);
     } catch (err: any) {
       console.error(err);
-      setErrorMsg(err?.message || "Reveal failed.");
+      const msg = (err?.message ?? String(err)) + " " + (err?.cause?.message ?? "");
+      setErrorMsg(
+        isTransientRelayerError(msg)
+          ? "The network is slow right now (relayer/RPC). Wait a moment and click Decrypt & Verify again."
+          : err?.message || "Reveal failed.",
+      );
     }
   };
 
@@ -477,6 +499,19 @@ export function Claim() {
               </div>
             ) : (
               <div className="space-y-4">
+                {/* Low gas warning — claiming needs Sepolia ETH for the tx + fee. */}
+                {isLowEth && (
+                  <div className="rounded-lg border border-gold/40 bg-gold-tint/40 p-3 text-xs text-gold-dim">
+                    Low on Sepolia ETH (
+                    <span className="font-mono">
+                      {Number(formatEther(ethBalance!.value)).toFixed(4)} ETH
+                    </span>
+                    ). Claiming sends an on-chain transaction with an attached gas
+                    fee — top up a little testnet ETH first, or the claim may fail
+                    with “insufficient funds.”
+                  </div>
+                )}
+
                 {/* Reveal & Decrypt */}
                 {decryptedAmount === null && (
                   <div className="space-y-2.5">
