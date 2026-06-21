@@ -160,6 +160,20 @@ export function Features() {
                 <h3 className="feature-card-title">{feature.title}</h3>
                 <p className="feature-card-body">{feature.body}</p>
               </div>
+
+              {/* Featured card fills its extra height with an on-chain cipher cue. */}
+              {i === 0 && (
+                <div className="feature-card-cipher">
+                  <p className="feature-card-cipher-label">Allocation · encrypted on-chain</p>
+                  <div className="feature-card-cipher-row">
+                    {["a9", "f3", "0c", "7d", "e1", "4b", "2f", "c8"].map((h) => (
+                      <span key={h} className="feature-card-cipher-chip">
+                        {h}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
