@@ -185,19 +185,16 @@ body {
   }
 }
 
-/* ── Custom cursor ────────────────────────────────────────────────────────
+/* ── Custom cursor — LANDING PAGE ONLY ──────────────────────────────────────
    Inline-SVG cursors (no external asset). The two trailing numbers are the
    hotspot (x y) — the active pixel — which we center on the ring. A keyword
-   fallback (auto / pointer) is mandatory or browsers ignore the whole rule. */
-body {
+   fallback (auto / pointer) is mandatory or browsers ignore the whole rule.
+   Scoped under `body.landing-cursor` — the Landing component toggles that class
+   on mount/unmount, so /admin and /claim keep the normal system cursor. */
+body.landing-cursor {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='6' fill='none' stroke='%237c3aed' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='1.5' fill='%237c3aed'/%3E%3C/svg%3E") 12 12, auto;
 }
-a,
-button,
-[role="button"],
-label,
-summary,
-.hero-card {
+body.landing-cursor :is(a, button, [role="button"], label, summary, .hero-card) {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ccircle cx='14' cy='14' r='11' fill='%237c3aed' fill-opacity='0.12' stroke='%237c3aed' stroke-width='2'/%3E%3C/svg%3E") 14 14, pointer;
 }
 
@@ -287,32 +284,19 @@ html.lenis {
   pointer-events: none;
 }
 
-/* ── WIPE-UP REVEAL ────────────────────────────────────────────────────────
-   Pure-CSS scroll reveal: the hero is `position: sticky` so it holds at the top
-   while the Features panel — opaque, higher z-index — slides up over it on plain
-   (Lenis-smoothed) scroll. No ScrollTrigger pin, so no consumed scroll / freeze;
-   the transition stays continuous, as if scrolling normally.
-
-   .reveal is the sticky containing block (hero + panel only, NOT the footer), so
-   the hero releases exactly at the panel's bottom and never floats over the
-   footer. Desktop + no-reduced-motion only; below that it's a normal stack. */
-@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .reveal-hero {
-    position: sticky;
-    top: 4rem; /* sit just below the sticky navbar when held */
-    z-index: 0;
-  }
-  .reveal-panel {
-    position: relative;
-    z-index: 2; /* paint over the sticky hero */
-  }
-  /* The rising panel reads as an opaque sheet with a rounded lip + cast shadow. */
-  .reveal-panel .features-section {
-    background: var(--color-bg);
-    border-top-left-radius: 1.5rem;
-    border-top-right-radius: 1.5rem;
-    box-shadow: 0 -22px 50px -24px rgba(40, 24, 80, 0.22);
-  }
+/* ── Oversized footer wordmark (Bankyz-style) ──────────────────────────────
+   A very large, low-contrast "enveil" anchoring the page bottom. clamp() scales
+   it from phone to wide desktop without breaking the layout. */
+.footer-wordmark {
+  font-family: var(--font-wordmark);
+  font-size: clamp(4rem, 18vw, 16rem);
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+  text-transform: lowercase;
+  color: var(--color-ink);
+  opacity: 0.07;
+  user-select: none;
+  pointer-events: none;
 }
 
 /* ── FEATURES SECTION ──────────────────────────────────────────────────── */
