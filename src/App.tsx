@@ -43,12 +43,10 @@ function Wordmark({ light }: { light?: boolean }) {
     <Link
       to="/"
       className="flex items-center gap-2.5 transition-opacity duration-150 hover:opacity-80"
+      style={{ color: light ? "#fff" : "var(--color-ink)" }}
     >
       <Shield size={20} />
-      <span
-        className="font-wordmark text-base lowercase tracking-wider sm:text-lg"
-        style={{ color: light ? "#fff" : "var(--color-ink)" }}
-      >
+      <span className="font-wordmark text-base lowercase tracking-wider sm:text-lg">
         enveil
       </span>
     </Link>
@@ -70,7 +68,13 @@ function MarketingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useLenis(({ scroll }: { scroll: number }) => setScrolled(scroll > 80));
+  useLenis(({ scroll }: { scroll: number }) => {
+    const isScrolled = scroll > 80;
+    setScrolled(isScrolled);
+    if (isScrolled) {
+      setMenuOpen(false);
+    }
+  });
 
   const goTo = (id: string) => {
     setMenuOpen(false);
@@ -81,47 +85,76 @@ function MarketingNav() {
     <header
       style={{
         position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
+        top: scrolled ? "1.25rem" : "0",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: scrolled ? "calc(100% - 2rem)" : "100%",
+        maxWidth: scrolled ? "360px" : "1200px",
+        borderRadius: scrolled ? "9999px" : "0",
         zIndex: 30,
-        transition: "background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease",
-        borderBottom: scrolled ? "1px solid var(--color-edge)" : "1px solid transparent",
-        background: scrolled ? "rgba(226,226,223,0.75)" : "transparent",
-        backdropFilter: scrolled ? "blur(12px)" : "none",
-        WebkitBackdropFilter: scrolled ? "blur(12px)" : "none",
+        transition: "all 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
+        border: scrolled ? "1px solid rgba(0, 0, 0, 0.08)" : "1px solid transparent",
+        borderBottom: scrolled ? "1px solid rgba(0, 0, 0, 0.08)" : "1px solid transparent",
+        background: scrolled ? "rgba(255, 255, 255, 0.72)" : "transparent",
+        backdropFilter: scrolled ? "blur(14px)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(14px)" : "none",
+        boxShadow: scrolled ? "0 12px 30px -10px rgba(0, 0, 0, 0.12), 0 4px 12px -5px rgba(0, 0, 0, 0.05)" : "none",
       }}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
+      <div
+        className="flex items-center justify-between"
+        style={{
+          width: "100%",
+          padding: scrolled ? "0.45rem 1.25rem" : "0.875rem 1.5rem",
+          transition: "padding 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      >
         <Wordmark light={!scrolled} />
 
         {/* Center anchor links (desktop) */}
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav
+          className="hidden md:flex items-center"
+          style={{
+            gap: scrolled ? "0px" : "2rem",
+            opacity: scrolled ? 0 : 1,
+            maxWidth: scrolled ? "0px" : "500px",
+            transform: scrolled ? "scale(0.9) translateY(-6px)" : "scale(1) translateY(0)",
+            pointerEvents: scrolled ? "none" : "auto",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            transition: "all 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
           {SECTIONS.map((s) => (
             <button
               key={s.id}
               type="button"
               onClick={() => goTo(s.id)}
               className="link-rise py-1 text-sm font-medium transition-colors duration-150"
-              style={{ color: scrolled ? "var(--color-mute)" : "rgba(255,255,255,0.78)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = scrolled ? "var(--color-ink)" : "#fff")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = scrolled ? "var(--color-mute)" : "rgba(255,255,255,0.78)")}
+              style={{ color: "rgba(255, 255, 255, 0.78)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255, 255, 255, 0.78)")}
             >
               {s.label}
             </button>
           ))}
         </nav>
 
-        {/* Right action (desktop) */}
-        <div className="hidden items-center md:flex">
+        {/* Right action and mobile trigger */}
+        <div className="flex items-center">
           <Link
             to="/admin"
-            className="group inline-flex items-center gap-2 rounded-full bg-violet px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet/25 transition-all duration-150 hover:-translate-y-0.5 hover:bg-violet-hover"
+            className="group inline-flex items-center gap-2 rounded-full bg-violet font-semibold text-white transition-all duration-150 hover:-translate-y-0.5 hover:bg-violet-hover"
+            style={{
+              padding: scrolled ? "0.45rem 1.1rem" : "0.6rem 1.25rem",
+              fontSize: scrolled ? "0.825rem" : "0.875rem",
+              boxShadow: scrolled ? "0 4px 12px rgba(124,58,237,0.2)" : "0 8px 20px rgba(124,58,237,0.25)",
+            }}
           >
             Open App
             <svg
-              width="16"
-              height="16"
+              width={scrolled ? "14" : "16"}
+              height={scrolled ? "14" : "16"}
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -133,38 +166,43 @@ function MarketingNav() {
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
           </Link>
-        </div>
 
-        {/* Mobile: Open App + hamburger */}
-        <div className="flex items-center gap-2 md:hidden">
-          <Link
-            to="/admin"
-            className="inline-flex items-center rounded-full bg-violet px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet/25"
-          >
-            Open App
-          </Link>
-          <button
-            type="button"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((v) => !v)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-sm"
+          {/* Mobile hamburger menu (only on mobile, collapses when scrolled) */}
+          <div
+            className="flex items-center md:hidden"
             style={{
-              borderColor: scrolled ? "var(--color-edge)" : "rgba(255,255,255,0.3)",
-              background: scrolled ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.12)",
-              color: scrolled ? "var(--color-ink)" : "#fff",
+              opacity: scrolled ? 0 : 1,
+              maxWidth: scrolled ? "0px" : "60px",
+              transform: scrolled ? "scale(0.9)" : "scale(1)",
+              pointerEvents: scrolled ? "none" : "auto",
+              overflow: "hidden",
+              marginLeft: scrolled ? "0px" : "0.5rem",
+              transition: "all 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              {menuOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M3 6h18M3 12h18M3 18h18" />}
-            </svg>
-          </button>
+            <button
+              type="button"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((v) => !v)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-sm"
+              style={{
+                borderColor: "rgba(255,255,255,0.3)",
+                background: "rgba(255,255,255,0.12)",
+                color: "#fff",
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                {menuOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M3 6h18M3 12h18M3 18h18" />}
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Mobile dropdown panel */}
-      {menuOpen && (
-        <div className="border-t border-edge/60 bg-bg/95 backdrop-blur-md md:hidden">
+      {/* Mobile dropdown panel (only when NOT scrolled and open) */}
+      {!scrolled && menuOpen && (
+        <div className="border-t border-edge/60 bg-bg/95 backdrop-blur-md md:hidden animate-step-in">
           <nav className="mx-auto flex max-w-6xl flex-col px-4 py-2 sm:px-6">
             {SECTIONS.map((s) => (
               <button
