@@ -38,14 +38,17 @@ export function App() {
 }
 
 /* ── Brand wordmark (shared by both navs) ─────────────────────────────────── */
-function Wordmark() {
+function Wordmark({ light }: { light?: boolean }) {
   return (
     <Link
       to="/"
       className="flex items-center gap-2.5 transition-opacity duration-150 hover:opacity-80"
     >
       <Shield size={20} />
-      <span className="font-wordmark text-base lowercase tracking-wider text-ink sm:text-lg">
+      <span
+        className="font-wordmark text-base lowercase tracking-wider sm:text-lg"
+        style={{ color: light ? "#fff" : "var(--color-ink)" }}
+      >
         enveil
       </span>
     </Link>
@@ -67,8 +70,6 @@ function MarketingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Track scroll position off Lenis' eased scroll so the frost matches the
-  // smooth motion (not the native jump).
   useLenis(({ scroll }: { scroll: number }) => setScrolled(scroll > 80));
 
   const goTo = (id: string) => {
@@ -78,15 +79,21 @@ function MarketingNav() {
 
   return (
     <header
-      className={
-        "sticky top-0 z-30 transition-all duration-300 " +
-        (scrolled
-          ? "border-b border-edge/60 bg-bg/75 backdrop-blur-md"
-          : "border-b border-transparent bg-transparent")
-      }
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 30,
+        transition: "background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease",
+        borderBottom: scrolled ? "1px solid var(--color-edge)" : "1px solid transparent",
+        background: scrolled ? "rgba(226,226,223,0.75)" : "transparent",
+        backdropFilter: scrolled ? "blur(12px)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(12px)" : "none",
+      }}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
-        <Wordmark />
+        <Wordmark light={!scrolled} />
 
         {/* Center anchor links (desktop) */}
         <nav className="hidden items-center gap-8 md:flex">
@@ -95,7 +102,10 @@ function MarketingNav() {
               key={s.id}
               type="button"
               onClick={() => goTo(s.id)}
-              className="link-rise py-1 text-sm font-medium text-mute transition-colors duration-150 hover:text-ink"
+              className="link-rise py-1 text-sm font-medium transition-colors duration-150"
+              style={{ color: scrolled ? "var(--color-mute)" : "rgba(255,255,255,0.78)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = scrolled ? "var(--color-ink)" : "#fff")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = scrolled ? "var(--color-mute)" : "rgba(255,255,255,0.78)")}
             >
               {s.label}
             </button>
@@ -138,7 +148,12 @@ function MarketingNav() {
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-edge bg-panel/70 text-ink backdrop-blur-sm"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-sm"
+            style={{
+              borderColor: scrolled ? "var(--color-edge)" : "rgba(255,255,255,0.3)",
+              background: scrolled ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.12)",
+              color: scrolled ? "var(--color-ink)" : "#fff",
+            }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               {menuOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M3 6h18M3 12h18M3 18h18" />}

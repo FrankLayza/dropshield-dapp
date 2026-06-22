@@ -1,126 +1,231 @@
-import { useRef, useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
+import { useLenis } from "lenis/react";
 import { Footer } from "@/components/Footer";
 import { Features } from "@/components/Features";
+import { HowItWorks } from "@/components/HowItWorks";
+import { Security } from "@/components/Security";
 
-/* ── Contiant-style hero, DropShield content ───────────────────────────────
-   Two-column hero: left = headline / subhead / CTA + a bottom trust strip;
-   right = a cluster of floating cards joined by dashed connectors telling
-   DropShield's confidential-claim story (recipient → masked allocation →
-   authorize → claimed). The entrance + idle float are driven by GSAP (one
-   orchestrated timeline); Lenis (configured in App.tsx) carries the scroll.
-   The violet accent lives in @theme as --color-violet*; global ink/gold stay. */
+/* ── Landing ─────────────────────────────────────────────────────────────────
+   B2B marketing page, "Bankyz" blueprint restyled to Enveil (light + violet).
+   Seven stacked sections, plain top-to-bottom scroll:
+     hero → trust bar → how it works → use cases → security → final CTA → footer.
+   One selling point throughout: token grants are permanently public on-chain;
+   Enveil makes them private. The custom cursor is scoped to this page only
+   (body.landing-cursor, toggled below). */
 
-/* Features data is now in the Features component */
-
-const TRUST = ["Zama Protocol", "TokenOps SDK", "ERC-7984", "FHE"];
+const TRUST = [
+  "Zama FHE",
+  "TokenOps SDK",
+  "OpenZeppelin Audited",
+  "ERC-7984",
+  "Sepolia",
+];
 
 export function Landing() {
   const heroRef = useRef<HTMLElement>(null);
+  const lenis = useLenis();
 
-  // The wipe-up reveal is pure CSS now (see .reveal-hero / .reveal-panel in
-  // index.css): the hero is `position: sticky` and the Features panel slides
-  // up over it on native, Lenis-smoothed scroll. No ScrollTrigger pin — pinning
-  // consumed a viewport of scroll before the wipe started, which read as the
-  // hero "freezing" mid-scroll. Sticky overlap stays continuous and smooth.
+  // Scope the custom cursor to the landing page only — added on mount, removed
+  // on unmount so /admin and /claim restore the normal system cursor.
+  useEffect(() => {
+    document.body.classList.add("landing-cursor");
+    return () => document.body.classList.remove("landing-cursor");
+  }, []);
 
-  // GSAP entrance timeline + idle float, scoped to the hero. useLayoutEffect so
-  // the from-state is set before paint (no flash). Honors reduced-motion.
+  // Hero entrance: eyebrow → title → sub → cta → cards. useLayoutEffect so the
+  // from-state is set before paint (no flash). Honors reduced-motion.
   useLayoutEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tl.from(".js-title", { y: 28, opacity: 0, duration: 0.9 })
-        .from(".js-sub", { y: 20, opacity: 0, duration: 0.75 }, "-=0.6")
-        .from(".js-cta", { y: 16, opacity: 0, duration: 0.6 }, "-=0.5")
-        .from(
-          ".js-card",
-          { y: 34, opacity: 0, scale: 0.95, duration: 0.7, stagger: 0.1 },
-          "-=0.55",
-        )
-        .add(() => {
-          // Gentle, desynced idle float — each card drifts on its own clock.
-          gsap.utils.toArray<HTMLElement>(".js-card").forEach((el, i) => {
-            gsap.to(el, {
-              y: "-=8",
-              duration: 3.2 + i * 0.35,
-              ease: "sine.inOut",
-              repeat: -1,
-              yoyo: true,
-            });
-          });
-        });
+      gsap
+        .timeline({ defaults: { ease: "power3.out" } })
+        .from(".js-eyebrow",  { y: 18, opacity: 0, duration: 0.6 })
+        .from(".js-title",    { y: 28, opacity: 0, duration: 0.9 }, "-=0.35")
+        .from(".js-sub",      { y: 20, opacity: 0, duration: 0.75 }, "-=0.6")
+        .from(".js-cta",      { y: 16, opacity: 0, duration: 0.6 }, "-=0.5");
     }, heroRef);
-
     return () => ctx.revert();
   }, []);
 
   return (
     <div className="relative">
-      {/* ── Reveal stage: containing block that bounds the sticky hero so it
-           releases exactly at the panel's end (never floats over the footer). ── */}
-      <div className="reveal">
-      {/* ── Sticky base: hero + trust strip get covered by the rising panel ── */}
-      <div className="reveal-hero">
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      {/* ── 1 · HERO ───────────────────────────────────────────────────────── */}
       <section
         ref={heroRef}
-        className="grid items-center gap-12 pb-10 pt-2 lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:pb-16 lg:pt-4"
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          paddingTop: "10rem",
+          paddingBottom: "6rem",
+          textAlign: "center",
+          backgroundImage: "url('/illustrations/hero-bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+          backgroundRepeat: "no-repeat",
+          minHeight: "90vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        {/* Left column */}
-        <div>
-          <h1 className="js-title max-w-2xl font-display text-[2.125rem] font-extrabold leading-[1.05] tracking-[-0.02em] sm:text-5xl md:text-6xl lg:text-[4.25rem]">
-            <span className="text-violet">Private payroll</span>
-            <br />
-            <span className="text-ink">for </span>
-            <span className="relative inline-block whitespace-nowrap text-ink">
-              DAOs
+        {/* Dark overlay for text contrast */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.5)",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Content column */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            maxWidth: "52rem",
+            margin: "0 auto",
+            padding: "0 1.5rem",
+          }}
+        >
+          {/* Eyebrow pill */}
+          <span
+            className="js-eyebrow"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              borderRadius: "9999px",
+              border: "1px solid rgba(255,255,255,0.25)",
+              background: "rgba(255,255,255,0.12)",
+              backdropFilter: "blur(8px)",
+              padding: "0.35rem 1rem",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.7rem",
+              fontWeight: 600,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.9)",
+              marginBottom: "1.5rem",
+            }}
+          >
+            <span
+              style={{
+                width: "0.375rem",
+                height: "0.375rem",
+                borderRadius: "50%",
+                background: "var(--color-violet)",
+                flexShrink: 0,
+              }}
+            />
+            Confidential token distribution
+          </span>
+
+          {/* Headline */}
+          <h1
+            className="js-title"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(2.5rem, 6.5vw, 4.5rem)",
+              fontWeight: 800,
+              lineHeight: 1.04,
+              letterSpacing: "-0.025em",
+              color: "#ffffff",
+              margin: "0 auto 1.5rem",
+              maxWidth: "44rem",
+            }}
+          >
+            Token grants shouldn't be{" "}
+            <span style={{ position: "relative", display: "inline-block", color: "var(--color-violet-line)", whiteSpace: "nowrap" }}>
+              everyone's business.
               <UnderlineSquiggle />
             </span>
           </h1>
 
-          <p className="js-sub mt-5 max-w-md text-base leading-relaxed text-mute sm:mt-6">
-            Pay your team in confidential ERC-7984 tokens — every amount encrypted on-chain.
-            Contributors verify and claim only their own. Nobody else sees what anyone earns.
+          {/* Subtext */}
+          <p
+            className="js-sub"
+            style={{
+              fontSize: "1.05rem",
+              lineHeight: 1.65,
+              color: "rgba(255,255,255,0.78)",
+              maxWidth: "34rem",
+              margin: "0 auto 2.25rem",
+            }}
+          >
+            Enveil encrypts every allocation on-chain with Fully Homomorphic
+            Encryption. Your contributors verify and claim only their own grant —
+            amounts stay confidential from everyone else. Forever.
           </p>
 
-          <div className="js-cta mt-7 flex flex-wrap items-center gap-3 sm:mt-9 sm:gap-4">
+          {/* CTAs */}
+          <div
+            className="js-cta"
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.75rem",
+            }}
+          >
             <Link
               to="/admin"
-              className="group inline-flex items-center gap-2.5 rounded-full bg-violet px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet/25 transition-all duration-150 hover:-translate-y-0.5 hover:bg-violet-hover sm:px-7 sm:py-3.5 sm:text-base"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.6rem",
+                borderRadius: "9999px",
+                background: "var(--color-violet)",
+                padding: "0.9rem 1.75rem",
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                color: "#fff",
+                textDecoration: "none",
+                boxShadow: "0 8px 28px -10px rgba(124,58,237,0.5)",
+                transition: "transform 0.15s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "")}
             >
-              Create a campaign
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="transition-transform duration-150 group-hover:translate-x-1"
-              >
-                <path d="M5 12h14M13 6l6 6-6 6" />
+              Open App
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 17L17 7M7 7h10v10" />
               </svg>
             </Link>
-            <Link
-              to="/claim"
-              className="inline-flex items-center gap-2 rounded-full border border-violet/25 bg-white/70 px-5 py-3 text-sm font-semibold text-violet-deep backdrop-blur-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-violet/40 hover:bg-white sm:px-6 sm:py-3.5 sm:text-base"
+
+            <button
+              type="button"
+              onClick={() => lenis?.scrollTo("#how-it-works", { offset: -72 })}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                borderRadius: "9999px",
+                border: "1.5px solid rgba(255,255,255,0.35)",
+                background: "rgba(255,255,255,0.12)",
+                backdropFilter: "blur(8px)",
+                padding: "0.9rem 1.75rem",
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                color: "#ffffff",
+                cursor: "pointer",
+                transition: "transform 0.15s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "")}
             >
-              Claim your payment
-            </Link>
+              How it works
+            </button>
           </div>
         </div>
-
-        {/* Right column — floating claim-flow cluster */}
-        <ClaimFlowCluster />
       </section>
 
-      {/* ── TRUST STRIP ──────────────────────────────────────────────────── */}
-      <div className="mt-10 border-t border-edge pt-8 lg:mt-14">
+      {/* ── 2 · TRUST BAR ──────────────────────────────────────────────────── */}
+      <div className="mx-auto max-w-6xl border-t border-edge px-4 py-10 sm:px-6">
         <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-faint">
           Built on audited, open infrastructure
         </p>
@@ -136,249 +241,78 @@ export function Landing() {
           ))}
         </div>
       </div>
-      </div>
-      {/* ── /reveal-hero ──────────────────────────────────────────────────── */}
 
-      {/* ── FEATURES — slides up over the sticky hero ──────────────────────── */}
-      <div className="reveal-panel">
-        <Features revealMode />
-      </div>
-      </div>
-      {/* ── /reveal stage ─────────────────────────────────────────────────── */}
+      {/* ── 3 · HOW IT WORKS ───────────────────────────────────────────────── */}
+      <HowItWorks />
 
+      {/* ── 4 · USE CASES ──────────────────────────────────────────────────── */}
+      <Features />
+
+      {/* ── 5 · SECURITY ───────────────────────────────────────────────────── */}
+      <Security />
+
+      {/* ── 6 · FINAL CTA ──────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+        <div
+          className="flex flex-col items-start gap-6 rounded-3xl border border-violet-edge p-9 sm:flex-row sm:items-center sm:justify-between sm:p-12"
+          style={{
+            background:
+              "linear-gradient(135deg, var(--color-violet-tint), var(--color-violet-edge))",
+          }}
+        >
+          <div>
+            <h2 className="font-display text-2xl font-extrabold leading-[1.1] tracking-[-0.02em] text-violet-ink sm:text-3xl">
+              Ready to run your first private grant?
+            </h2>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-violet-ink/80 sm:text-base">
+              Set up a campaign in under five minutes on Sepolia. No custom
+              contracts. No backend.
+            </p>
+          </div>
+          <Link
+            to="/admin"
+            className="group inline-flex shrink-0 items-center gap-2.5 rounded-full bg-violet px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-violet/25 transition-all duration-150 hover:-translate-y-0.5 hover:bg-violet-hover"
+          >
+            Open App
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.25"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-transform duration-150 group-hover:translate-x-1"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </Link>
+        </div>
+      </section>
+
+      {/* ── 7 · FOOTER ─────────────────────────────────────────────────────── */}
       <Footer />
     </div>
   );
 }
 
-/* ── Hand-drawn violet underline beneath the highlighted keyword ──────────── */
+/* ── Hand-drawn underline beneath the highlighted phrase ────────────────── */
 function UnderlineSquiggle() {
   return (
     <svg
       aria-hidden
       viewBox="0 0 200 12"
       preserveAspectRatio="none"
-      className="absolute -bottom-2 left-0 h-3 w-full"
+      style={{ position: "absolute", bottom: "-0.4rem", left: 0, height: "0.75rem", width: "100%" }}
     >
       <path
         d="M3 7 C 40 2, 80 11, 120 5 S 180 3, 197 7"
         fill="none"
-        stroke="var(--color-violet)"
+        stroke="var(--color-violet-line)"
         strokeWidth="3"
         strokeLinecap="round"
       />
     </svg>
-  );
-}
-
-/* ── Right-side cluster ────────────────────────────────────────────────────
-   Cards float at varied offsets, joined by dashed connectors, with one
-   accent-colored "claimed" card. Each card carries .js-card so the hero's
-   GSAP timeline animates it in and floats it. */
-function ClaimFlowCluster() {
-  return (
-    <div className="relative">
-      {/* Mobile: one cohesive preview card telling the claim story end-to-end
-          (the desktop constellation below is lg-only). */}
-      <div className="js-card mx-auto w-full max-w-sm lg:hidden">
-        <MobileClaimPreview />
-      </div>
-
-      {/* Desktop: full constellation */}
-      <div className="relative hidden h-[540px] w-full lg:block">
-        {/* Dashed connectors behind the cards */}
-        <svg
-          aria-hidden
-          viewBox="0 0 520 540"
-          preserveAspectRatio="none"
-          className="absolute inset-0 h-full w-full"
-        >
-          <g fill="none" stroke="var(--color-violet-line)" strokeWidth="1.5" strokeDasharray="5 6">
-            <path d="M250 120 C 250 200, 150 200, 150 280" />
-            <path d="M395 165 C 460 230, 360 250, 360 300" />
-            <path d="M300 380 C 370 360, 330 330, 322 305" />
-          </g>
-        </svg>
-
-        <div className="js-card hero-card absolute left-0 top-6 w-44">
-          <RecipientCard />
-        </div>
-        <div className="js-card hero-card absolute left-40 top-0 w-60">
-          <AllocationCard />
-        </div>
-        <div className="js-card hero-card absolute right-0 top-8 w-44">
-          <ProofCard />
-        </div>
-        <div className="js-card hero-card absolute left-8 top-72 w-72">
-          <AuthorizeCard />
-        </div>
-        <div className="js-card hero-card absolute right-0 top-[300px] w-44">
-          <ClaimedCard />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ── Mobile hero visual ─────────────────────────────────────────────────────
-   On phones the floating constellation collapses to one self-contained card
-   that tells the whole story: who's paid → masked allocation → decrypt. */
-function MobileClaimPreview() {
-  return (
-    <div className={CARD + " p-4"}>
-      {/* Recipient */}
-      <div className="flex items-center gap-3">
-        <span
-          className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full"
-          style={{ background: "linear-gradient(140deg,var(--color-violet-tint),var(--color-violet-line))" }}
-        >
-          <img
-            src="/illustrations/mara.png"
-            alt="Mara, recipient"
-            className="absolute inset-0 h-full w-full object-cover object-top"
-            loading="lazy"
-          />
-        </span>
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-ink">Mara</p>
-          <p className="text-xs text-mute">eng. lead</p>
-        </div>
-        <span className="ml-auto shrink-0 rounded-full bg-violet-tint/60 px-2.5 py-1 text-[11px] font-medium text-violet-deep">
-          Q2 Payroll
-        </span>
-      </div>
-
-      {/* Masked allocation */}
-      <div className="mt-4 rounded-xl border border-violet-line/60 bg-violet-tint/30 px-4 py-3.5 text-center">
-        <p className="text-xs font-medium text-mute">Your allocation</p>
-        <p className="mt-1 font-mono text-2xl font-semibold tracking-widest text-faint select-none">
-          •••••• <span className="text-sm tracking-normal">tokens</span>
-        </p>
-      </div>
-
-      {/* Action */}
-      <button
-        type="button"
-        className="mt-3 w-full rounded-full bg-ink py-3 text-xs font-semibold uppercase tracking-wider text-white"
-      >
-        Decrypt &amp; verify
-      </button>
-      <p className="mt-2.5 text-center text-[11px] text-faint">
-        Encrypted on-chain · only you can decrypt
-      </p>
-    </div>
-  );
-}
-
-/* ── Card primitives ──────────────────────────────────────────────────────── */
-const CARD =
-  "rounded-2xl border border-black/[0.04] bg-white shadow-[0_24px_60px_-24px_rgba(40,24,80,0.28)]";
-
-function RecipientCard() {
-  return (
-    <div className={CARD + " overflow-hidden p-3"}>
-      <div
-        className="relative h-44 w-full overflow-hidden rounded-xl"
-        style={{ background: "linear-gradient(140deg,var(--color-violet-tint),var(--color-violet-line))" }}
-      >
-        <img
-          src="/illustrations/mara.png"
-          alt="Mara, recipient"
-          className="absolute inset-x-0 bottom-0 mx-auto h-[92%] w-auto object-contain object-bottom"
-          loading="lazy"
-        />
-        <span className="absolute bottom-2.5 left-2.5 rounded-lg bg-white/95 px-2.5 py-1 text-xs shadow-sm backdrop-blur-sm">
-          <span className="block font-semibold text-ink">Mara</span>
-          <span className="block text-[10px] text-mute">eng. lead</span>
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function AllocationCard() {
-  return (
-    <div className={CARD + " p-4"}>
-      <p className="text-xs font-medium text-mute">Your allocation</p>
-      <p className="mt-2 font-mono text-2xl font-semibold tracking-widest text-faint select-none">
-        •••••• <span className="text-sm tracking-normal">tokens</span>
-      </p>
-      <button
-        className="mt-4 w-full rounded-full bg-ink py-2.5 text-xs font-semibold uppercase tracking-wider text-white"
-        type="button"
-      >
-        Decrypt &amp; verify
-      </button>
-    </div>
-  );
-}
-
-function ProofCard() {
-  return (
-    <div className={CARD + " p-4"}>
-      <p className="text-center text-xs font-medium text-mute">On-chain ciphertext</p>
-      <div className="mt-3 grid grid-cols-3 gap-1.5">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <span
-            key={i}
-            className="flex h-7 items-center justify-center rounded-md bg-violet-tint/50 font-mono text-[10px] text-violet-deep/70"
-          >
-            {["a9", "f3", "0c", "7d", "e1", "4b", "2f", "c8", "5a"][i]}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function AuthorizeCard() {
-  return (
-    <div className={CARD + " p-5"}>
-      <p className="text-sm font-semibold text-ink">Authorize claim</p>
-      <dl className="mt-3 space-y-1.5 text-sm">
-        <Row label="Amount" value="•••• " />
-        <Row label="Recipient" value="Mara" />
-        <Row label="Campaign" value="Q2 Payroll" />
-        <Row label="Sig (EIP-712)" value="0x9f…c8" mono />
-      </dl>
-      <button
-        type="button"
-        className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white"
-      >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 6 9 17l-5-5" />
-        </svg>
-        Confirm claim
-      </button>
-    </div>
-  );
-}
-
-function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div className="flex items-center justify-between">
-      <dt className="text-mute">{label}</dt>
-      <dd className={(mono ? "font-mono " : "") + "font-medium text-ink"}>{value}</dd>
-    </div>
-  );
-}
-
-function ClaimedCard() {
-  return (
-    <div
-      className="rounded-2xl p-5 shadow-[0_24px_60px_-24px_rgba(80,40,180,0.45)]"
-      style={{ background: "linear-gradient(160deg,var(--color-violet-tint),var(--color-violet-edge))" }}
-    >
-      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-violet text-white">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 6 9 17l-5-5" />
-        </svg>
-      </span>
-      <p className="mt-3 text-sm font-semibold leading-snug text-violet-ink">
-        Allocation
-        <br />
-        claimed
-      </p>
-    </div>
   );
 }

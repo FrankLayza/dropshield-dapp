@@ -29,7 +29,7 @@ export function Security() {
       className="w-full py-20 sm:py-28"
       style={{
         background:
-          "linear-gradient(180deg, transparent, var(--color-violet-tint) 18%, var(--color-violet-tint) 82%, transparent)",
+          "linear-gradient(180deg, var(--color-bg), var(--color-violet-tint) 18%, var(--color-violet-tint) 82%, var(--color-bg))",
       }}
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">

@@ -53,6 +53,13 @@ export function Footer() {
         </div>
 
       </div>
+
+      {/* Oversized wordmark — anchors the page bottom (Bankyz-style). */}
+      <div className="mt-10 overflow-hidden px-4 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <span className="footer-wordmark block">enveil</span>
+        </div>
+      </div>
     </footer>
   );
 }
