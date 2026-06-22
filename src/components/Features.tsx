@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -6,17 +6,11 @@ import { useLenis } from "lenis/react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-/* ── Use Cases ──────────────────────────────────────────────────────────────
-   Bento grid: a tall featured card (Token Vesting — the lead use case) plus two
-   stacked cards (Payroll, Investor Distributions). Copy shifts from "features"
-   to "who uses this and why", which is more persuasive for a B2B sender.
-   Community Airdrop is intentionally NOT shown here — it stays in the app/README
-   only, so the landing leads with the more serious B2B framing. */
 const USE_CASES = [
   {
     title: "Token Vesting",
     tagline: "Your grant schedule is your business.",
-    body: "Startups and protocols hand grants to team members, advisors, and early contributors — and every amount and schedule sits in public on Etherscan. Enveil encrypts the total grant on-chain. Recipients see only what they've vested; nobody else sees anything.",
+    body: "Every grant amount sits in public on Etherscan. Enveil encrypts allocations on-chain — recipients see only what they've vested.",
     bestFor: "protocol teams, founder & advisor grants",
     illustration: "/illustrations/salary-privacy.png",
     bg: "#DFD1F4",
@@ -45,12 +39,12 @@ const USE_CASES = [
   },
 ];
 
-/* ── Use Cases Section ──────────────────────────────────────────────────────── */
 export function Features() {
   const sectionRef = useRef<HTMLElement>(null);
+  const [vestingImgOk, setVestingImgOk] = useState(true);
+  const [payrollImgOk, setPayrollImgOk] = useState(true);
+  const [investorImgOk, setInvestorImgOk] = useState(true);
 
-  // Sync Lenis' smooth scroll position into ScrollTrigger on every frame, so the
-  // scrub-driven parallax tracks the eased scroll instead of the native one.
   useLenis(() => ScrollTrigger.update());
 
   useGSAP(
@@ -86,12 +80,11 @@ export function Features() {
             ease: "power3.out",
           });
 
-          /* Scroll-driven parallax on each illustration (desktop only). Driven by
-             scrub → smoothed by the Lenis ↔ ScrollTrigger sync above. */
+          /* Scroll-driven parallax on each illustration (desktop only). */
           if (isDesktop) {
             gsap.utils.toArray<HTMLElement>(".js-feature-illustration").forEach((el, i) => {
               gsap.to(el, {
-                yPercent: i % 2 === 0 ? -10 : -16,
+                yPercent: i % 2 === 0 ? -5 : -10,
                 ease: "none",
                 scrollTrigger: {
                   trigger: el,
@@ -107,6 +100,10 @@ export function Features() {
     },
     { scope: sectionRef },
   );
+
+  const vesting = USE_CASES[0];
+  const payroll = USE_CASES[1];
+  const investor = USE_CASES[2];
 
   return (
     <section ref={sectionRef} className="features-section" id="use-cases">
@@ -124,62 +121,168 @@ export function Features() {
           </p>
         </div>
 
-        {/* ── Bento cards ── */}
+        {/* ── Bento grid ── */}
         <div className="features-grid">
-          {USE_CASES.map((useCase, i) => (
-            <div
-              key={useCase.title}
-              className={
-                "js-feature-card feature-card" +
-                (i === 0 ? " feature-card--featured" : "")
-              }
-              style={
-                {
-                  "--card-bg": useCase.bg,
-                  "--card-accent": useCase.accent,
-                  "--card-accent-tint": useCase.accentTint,
-                } as React.CSSProperties
-              }
-            >
-              {/* Number */}
-              <span className="js-feature-number feature-card-number">
-                {String(i + 1).padStart(2, "0")}
-              </span>
+          
+          {/* CARD 1: Token Vesting (Tall, Left Column) */}
+          <div
+            className="js-feature-card feature-card feature-card--vesting"
+            style={{
+              "--card-bg": vesting.bg,
+              "--card-accent": vesting.accent,
+              "--card-accent-tint": vesting.accentTint,
+            } as React.CSSProperties}
+          >
+            <span className="feature-card-number">01</span>
+            
+            <div className="feature-card-content">
+              <h3 className="feature-card-title">{vesting.title}</h3>
+              <p className="feature-card-tagline">{vesting.tagline}</p>
+              <p className="feature-card-body">{vesting.body}</p>
+              <p className="feature-card-bestfor">Best for: {vesting.bestFor}</p>
+            </div>
 
-              {/* Illustration */}
-              <div className="feature-card-illustration-wrap">
+            {/* Illustration container */}
+            <div className="feature-card-image-wrap feature-card-image-wrap--tall">
+              {vestingImgOk ? (
                 <img
-                  src={useCase.illustration}
-                  alt={useCase.title}
-                  className="js-feature-illustration feature-card-illustration"
+                  src={vesting.illustration}
+                  alt={vesting.title}
+                  onError={() => setVestingImgOk(false)}
+                  className="js-feature-illustration feature-card-image"
                   loading="lazy"
-                  width={50}
                 />
-              </div>
-
-              {/* Content */}
-              <div className="js-feature-content feature-card-content">
-                <h3 className="feature-card-title">{useCase.title}</h3>
-                <p className="feature-card-tagline">{useCase.tagline}</p>
-                <p className="feature-card-body">{useCase.body}</p>
-                <p className="feature-card-bestfor">Best for: {useCase.bestFor}</p>
-              </div>
-
-              {/* Featured card fills its extra height with an on-chain cipher cue. */}
-              {i === 0 && (
-                <div className="feature-card-cipher">
-                  <p className="feature-card-cipher-label">Allocation · encrypted on-chain</p>
-                  <div className="feature-card-cipher-row">
-                    {["a9", "f3", "0c", "7d", "e1", "4b", "2f", "c8"].map((h) => (
-                      <span key={h} className="feature-card-cipher-chip">
-                        {h}
-                      </span>
-                    ))}
-                  </div>
+              ) : (
+                <div className="feature-card-image-fallback">
+                  <span>Token Vesting Illustration</span>
                 </div>
               )}
             </div>
-          ))}
+
+            {/* Allocation cipher display */}
+            <div className="feature-card-cipher">
+              <p className="feature-card-cipher-label">Allocations encrypted on-chain</p>
+              <div className="feature-card-cipher-row">
+                {["a9", "f3", "0c", "7d", "e1", "4b"].map((h) => (
+                  <span key={h} className="feature-card-cipher-chip">
+                    {h}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* CARD 2: Contributor Payroll (Wide, Right Column Top) */}
+          <div
+            className="js-feature-card feature-card feature-card--payroll"
+            style={{
+              "--card-bg": payroll.bg,
+              "--card-accent": payroll.accent,
+              "--card-accent-tint": payroll.accentTint,
+            } as React.CSSProperties}
+          >
+            <span className="feature-card-number">02</span>
+            
+            <div className="feature-card-payroll-inner">
+              <div className="feature-card-content">
+                <h3 className="feature-card-title">{payroll.title}</h3>
+                <p className="feature-card-tagline">{payroll.tagline}</p>
+                <p className="feature-card-body">{payroll.body}</p>
+                <p className="feature-card-bestfor">Best for: {payroll.bestFor}</p>
+              </div>
+
+              <div className="feature-card-image-wrap feature-card-image-wrap--wide">
+                {payrollImgOk ? (
+                  <img
+                    src={payroll.illustration}
+                    alt={payroll.title}
+                    onError={() => setPayrollImgOk(false)}
+                    className="js-feature-illustration feature-card-image"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="feature-card-image-fallback">
+                    <span>Payroll Illustration</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* CARD 3: Investor Distributions (Medium, Bottom Middle) */}
+          <div
+            className="js-feature-card feature-card feature-card--investor"
+            style={{
+              "--card-bg": investor.bg,
+              "--card-accent": investor.accent,
+              "--card-accent-tint": investor.accentTint,
+            } as React.CSSProperties}
+          >
+            <span className="feature-card-number">03</span>
+            
+            <div className="feature-card-content">
+              <h3 className="feature-card-title">{investor.title}</h3>
+              <p className="feature-card-tagline">{investor.tagline}</p>
+              <p className="feature-card-body">{investor.body}</p>
+              <p className="feature-card-bestfor">Best for: {investor.bestFor}</p>
+            </div>
+
+            <div className="feature-card-image-wrap feature-card-image-wrap--medium">
+              {investorImgOk ? (
+                <img
+                  src={investor.illustration}
+                  alt={investor.title}
+                  onError={() => setInvestorImgOk(false)}
+                  className="js-feature-illustration feature-card-image"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="feature-card-image-fallback">
+                  <span>Distributions Illustration</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* CARD 4: Secure & Trusted Stats (Small, Bottom Right) */}
+          <div
+            className="js-feature-card feature-card feature-card--trust"
+            style={{
+              "--card-bg": "#EAF3DE",
+              "--card-accent": "var(--color-success-green)",
+              "--card-accent-tint": "var(--color-success-bg)",
+            } as React.CSSProperties}
+          >
+            <span className="feature-card-number">★</span>
+
+            <div className="feature-card-trust-content">
+              <h3 className="feature-card-trust-title">
+                Trusted by 50+ Web3 Teams
+              </h3>
+              
+              {/* Stacked avatars */}
+              <div className="feature-card-avatars">
+                <div className="feature-card-avatar" style={{ backgroundColor: "#7c3aed", color: "#fff" }}>A</div>
+                <div className="feature-card-avatar" style={{ backgroundColor: "#0891b2", color: "#fff" }}>O</div>
+                <div className="feature-card-avatar" style={{ backgroundColor: "#ffcb00", color: "#3d2e00" }}>Z</div>
+                <div className="feature-card-avatar" style={{ backgroundColor: "#27500a", color: "#fff" }}>E</div>
+                <div className="feature-card-avatar feature-card-avatar--more">+10</div>
+              </div>
+
+              {/* Rating stars & verifiability */}
+              <div className="feature-card-rating">
+                <div className="feature-card-stars">
+                  {"★★★★★".split("").map((_, idx) => (
+                    <span key={idx} className="feature-card-star">★</span>
+                  ))}
+                </div>
+                <p className="feature-card-rating-text">
+                  Zero on-chain data leakage
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>

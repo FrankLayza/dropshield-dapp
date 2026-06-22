@@ -252,7 +252,7 @@ export function Landing() {
       <Security />
 
       {/* ── 6 · FINAL CTA ──────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         <div
           className="flex flex-col items-start gap-6 rounded-3xl border border-violet-edge p-9 sm:flex-row sm:items-center sm:justify-between sm:p-12"
           style={{

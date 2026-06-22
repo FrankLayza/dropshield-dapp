@@ -14,14 +14,14 @@ const STEPS = [
     number: 1,
     title: "Upload your list",
     body: "Add contributors or grantees with their amounts. No minimum, and no wallet needed to start.",
-    img: "/illustrations/hiw-step1.png",
+    img: "/illustrations/upload-enveil.png",
     imgAlt: "Spreadsheet showing contributor list being uploaded",
   },
   {
     number: 2,
     title: "Amounts encrypted in-browser",
     body: "FHE encrypts each allocation before it ever leaves your browser. On-chain: ciphertext only. Nobody reads it.",
-    img: "/illustrations/hiw-step2.png",
+    img: "/illustrations/encrypted-enveil.png",
     imgAlt: "Encrypted ciphertext and lock icon illustration",
   },
   {
@@ -91,7 +91,7 @@ export function HowItWorks() {
           />
 
           {STEPS.map((step) => (
-            <Reveal.Item key={step.number} className="flex flex-col items-center text-center">
+            <Reveal.Item key={step.number} className="flex flex-col items-center text-center h-full">
               <StepColumn step={step} />
             </Reveal.Item>
           ))}
@@ -167,6 +167,7 @@ function StepColumn({ step }: { step: (typeof STEPS)[number] }) {
           color: "var(--color-mute)",
           maxWidth: "22rem",
           marginBottom: "1.5rem",
+          flexGrow: 1,
         }}
       >
         {step.body}
@@ -175,6 +176,7 @@ function StepColumn({ step }: { step: (typeof STEPS)[number] }) {
       {/* Photo card */}
       <div
         style={{
+          marginTop: "auto",
           width: "100%",
           aspectRatio: "4 / 3",
           borderRadius: "1.25rem",

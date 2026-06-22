@@ -302,10 +302,15 @@ html.lenis {
 /* ── FEATURES SECTION ──────────────────────────────────────────────────── */
 .features-section {
   padding-top: 5rem;
-  padding-bottom: 3rem;
+  padding-bottom: 4rem;
   width: 100%;
   display: flex;
   justify-content: center;
+  position: relative;
+  background: var(--color-bg);
+  border-radius: 0 0 2.5rem 2.5rem;
+  overflow: hidden;
+  z-index: 1;
 }
 
 /* Inner column: bounds the full-bleed section back to content width and stacks
@@ -365,9 +370,7 @@ html.lenis {
   margin-inline: auto;
 }
 
-/* ── Cards: BENTO grid ──
-   Desktop = 2 columns: a tall featured card on the left spanning both rows, two
-   stacked cards on the right. Mobile collapses to a single column. */
+/* ── Cards: BENTO grid ── */
 .features-grid {
   display: grid;
   gap: 1.25rem;
@@ -375,35 +378,29 @@ html.lenis {
 }
 @media (min-width: 768px) {
   .features-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.5rem;
     align-items: stretch;
   }
-  .feature-card--featured {
+  .feature-card--vesting {
+    grid-column: span 1;
     grid-row: span 2;
   }
-  /* The featured card only earns its larger type + illustration on desktop,
-     where it's a tall 2-row cell. On mobile every card is equal, so these live
-     here (out of the base rules) — keeps all three cards pixel-identical on
-     phones. The cipher cue also only shows on the desktop featured card. */
-  .feature-card--featured .feature-card-illustration {
-    width: 6rem;
-    height: 6rem;
+  .feature-card--payroll {
+    grid-column: span 2;
+    grid-row: span 1;
   }
-  .feature-card--featured .feature-card-title {
-    font-size: 1.6rem;
+  .feature-card--investor {
+    grid-column: span 1;
+    grid-row: span 1;
   }
-  .feature-card--featured .feature-card-body {
-    font-size: 0.98rem;
-    max-width: 26rem;
-  }
-  .feature-card-cipher {
-    display: flex;
-    flex-direction: column;
+  .feature-card--trust {
+    grid-column: span 1;
+    grid-row: span 1;
   }
 }
 
-/* ── Individual card — carries its own soft color (the palette you liked) ── */
+/* ── Individual card ── */
 .feature-card {
   position: relative;
   display: flex;
@@ -458,30 +455,6 @@ html.lenis {
   opacity: 0.75;
 }
 
-/* Illustration — anchored top-left of each card; content flows beneath it. */
-.feature-card-illustration-wrap {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  margin-bottom: 1.25rem;
-}
-
-.feature-card-illustration {
-  width: 4.5rem;
-  height: 4.5rem;
-  object-fit: contain;
-  object-position: left top;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.1));
-}
-
-.feature-card-illustration-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 5.5rem;
-  height: 5.5rem;
-}
-
 /* Content area */
 .feature-card-content {
   padding: 0;
@@ -489,14 +462,18 @@ html.lenis {
 
 .feature-card-title {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.015em;
   color: var(--color-ink);
   line-height: 1.25;
 }
+@media (min-width: 768px) {
+  .feature-card--vesting .feature-card-title {
+    font-size: 1.6rem;
+  }
+}
 
-/* Tagline — the one-line "why" beneath the use-case name. */
 .feature-card-tagline {
   margin-top: 0.5rem;
   font-family: var(--font-display);
@@ -506,15 +483,18 @@ html.lenis {
   color: var(--color-ink);
 }
 
-/* Body text darkened for AA contrast on the tinted card backgrounds. */
 .feature-card-body {
   margin-top: 0.6rem;
   font-size: 0.9rem;
   line-height: 1.6;
   color: rgba(26, 26, 24, 0.68);
 }
+@media (min-width: 768px) {
+  .feature-card--vesting .feature-card-body {
+    font-size: 0.98rem;
+  }
+}
 
-/* "Best for:" — small mono qualifier in the card's accent color. */
 .feature-card-bestfor {
   margin-top: 0.85rem;
   font-family: var(--font-mono);
@@ -524,13 +504,95 @@ html.lenis {
   color: color-mix(in srgb, var(--card-accent) 78%, var(--color-ink));
 }
 
-/* Featured-card cipher cue — pushed to the bottom to fill the tall cell.
-   Hidden on mobile (where the featured card is just a normal card) and shown
-   in the desktop media query above, so all three mobile cards stay uniform. */
+/* Image container wrappers */
+.feature-card-image-wrap {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--color-recessed);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  margin-top: 1.5rem;
+}
+.feature-card:hover .feature-card-image-wrap {
+  transform: scale(1.02);
+}
+
+.feature-card-image-wrap--tall {
+  flex-grow: 1;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-card-image-wrap--wide {
+  flex-shrink: 0;
+  width: 100%;
+  height: 200px;
+}
+@media (min-width: 768px) {
+  .feature-card-image-wrap--wide {
+    width: 45%;
+    height: 100%;
+    margin-top: 0;
+  }
+}
+
+.feature-card-image-wrap--medium {
+  height: 180px;
+}
+
+.feature-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.feature-card-image-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--card-accent-tint), var(--color-edge));
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+/* Wide layout flex row inner */
+.feature-card-payroll-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .feature-card-payroll-inner {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+  }
+  .feature-card--payroll .feature-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/* Vesting Cipher row */
 .feature-card-cipher {
-  display: none;
-  margin-top: auto;
-  padding-top: 1.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
 }
 .feature-card-cipher-label {
   font-family: var(--font-mono);
@@ -554,6 +616,75 @@ html.lenis {
   border: 1px solid rgba(255, 255, 255, 0.75);
   border-radius: 0.5rem;
   padding: 0.28rem 0.55rem;
+}
+
+/* Small Trust Card */
+.feature-card--trust {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #EAF3DE;
+}
+.feature-card-trust-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.feature-card-trust-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--color-success-text);
+  line-height: 1.15;
+  margin-bottom: 1.25rem;
+}
+.feature-card-avatars {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.feature-card-avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid #EAF3DE;
+  margin-right: -0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+.feature-card-avatar--more {
+  background: #ffffff;
+  color: var(--color-success-text);
+  border-color: #EAF3DE;
+  font-size: 0.75rem;
+}
+.feature-card-rating {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.feature-card-stars {
+  display: flex;
+  gap: 0.1rem;
+}
+.feature-card-star {
+  color: var(--color-success-text);
+  font-size: 0.9rem;
+}
+.feature-card-rating-text {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-success-text);
+  font-weight: 600;
+  opacity: 0.85;
 }
 
 /* ── Closing CTA band ── */
@@ -599,6 +730,8 @@ html.lenis {
 @media (max-width: 767px) {
   .features-section {
     padding-top: 3.5rem;
+    padding-bottom: 3rem;
+    border-radius: 0 0 1.5rem 1.5rem;
   }
   .features-heading {
     margin-bottom: 2.5rem;
@@ -608,5 +741,26 @@ html.lenis {
   }
   .feature-card {
     padding: 1.5rem;
+  }
+  .feature-card-title {
+    font-size: 1.15rem;
+  }
+  .feature-card-body {
+    font-size: 0.85rem;
+  }
+  .feature-card-image-wrap--tall {
+    min-height: 180px;
+  }
+  .feature-card-image-wrap--wide {
+    height: 180px;
+  }
+  .feature-card-image-wrap--medium {
+    height: 160px;
+  }
+  .feature-card-cipher {
+    display: none;
+  }
+  .feature-card-trust-title {
+    font-size: 1.2rem;
   }
 }
