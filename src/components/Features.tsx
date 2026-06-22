@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -244,7 +245,7 @@ export function Features() {
             </div>
           </div>
 
-          {/* CARD 4: Secure & Trusted Stats (Small, Bottom Right) */}
+          {/* CARD 4: Try-it CTA (Small, Bottom Right) */}
           <div
             className="js-feature-card feature-card feature-card--trust"
             style={{
@@ -255,30 +256,37 @@ export function Features() {
           >
             <span className="feature-card-number">★</span>
 
-            <div className="feature-card-trust-content">
-              <h3 className="feature-card-trust-title">
-                Trusted by 50+ Web3 Teams
-              </h3>
-              
-              {/* Stacked avatars */}
-              <div className="feature-card-avatars">
-                <div className="feature-card-avatar" style={{ backgroundColor: "#7c3aed", color: "#fff" }}>A</div>
-                <div className="feature-card-avatar" style={{ backgroundColor: "#0891b2", color: "#fff" }}>O</div>
-                <div className="feature-card-avatar" style={{ backgroundColor: "#ffcb00", color: "#3d2e00" }}>Z</div>
-                <div className="feature-card-avatar" style={{ backgroundColor: "#27500a", color: "#fff" }}>E</div>
-                <div className="feature-card-avatar feature-card-avatar--more">+10</div>
-              </div>
+            <div className="feature-card-cta-content">
+              <h3 className="feature-card-cta-title">See it for yourself</h3>
+              <p className="feature-card-cta-body">
+                Run a private campaign on Sepolia in about five minutes. No
+                signup, no custom contracts.
+              </p>
 
-              {/* Rating stars & verifiability */}
-              <div className="feature-card-rating">
-                <div className="feature-card-stars">
-                  {"★★★★★".split("").map((_, idx) => (
-                    <span key={idx} className="feature-card-star">★</span>
-                  ))}
-                </div>
-                <p className="feature-card-rating-text">
-                  Zero on-chain data leakage
-                </p>
+              <div className="feature-card-cta-actions">
+                <Link to="/admin" className="feature-card-cta-primary">
+                  Open App
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </Link>
+                <a
+                  href="https://github.com/FrankLayza/dropshield-dapp"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="feature-card-cta-secondary"
+                >
+                  View source
+                </a>
               </div>
             </div>
           </div>

@@ -37,7 +37,7 @@ export function Security() {
           <span className="inline-block rounded-full bg-white/70 px-3.5 py-1.5 font-mono text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-violet backdrop-blur-sm">
             Security
           </span>
-          <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.08] tracking-[-0.025em] text-ink sm:text-[2.75rem]">
+          <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.08] tracking-tight text-ink sm:text-[2.75rem]">
             Not hidden.{" "}
             <span className="text-violet">Mathematically private.</span>
           </h2>

@@ -618,73 +618,74 @@ html.lenis {
   padding: 0.28rem 0.55rem;
 }
 
-/* Small Trust Card */
+/* Small Try-it CTA Card */
 .feature-card--trust {
   display: flex;
   flex-direction: column;
   justify-content: center;
   background: #EAF3DE;
 }
-.feature-card-trust-content {
+.feature-card-cta-content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
-.feature-card-trust-title {
+.feature-card-cta-title {
   font-family: var(--font-display);
   font-size: 1.4rem;
   font-weight: 800;
   letter-spacing: -0.025em;
   color: var(--color-success-text);
   line-height: 1.15;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.6rem;
 }
-.feature-card-avatars {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-.feature-card-avatar {
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  border: 2px solid #EAF3DE;
-  margin-right: -0.6rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  font-weight: 700;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
-.feature-card-avatar--more {
-  background: #ffffff;
-  color: var(--color-success-text);
-  border-color: #EAF3DE;
-  font-size: 0.75rem;
-}
-.feature-card-rating {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-.feature-card-stars {
-  display: flex;
-  gap: 0.1rem;
-}
-.feature-card-star {
-  color: var(--color-success-text);
+.feature-card-cta-body {
   font-size: 0.9rem;
-}
-.feature-card-rating-text {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  line-height: 1.6;
   color: var(--color-success-text);
+  opacity: 0.82;
+  margin-bottom: 1.5rem;
+  max-width: 22rem;
+}
+.feature-card-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+.feature-card-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 9999px;
+  background: var(--color-success-text);
+  color: #ffffff;
+  padding: 0.6rem 1.15rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  opacity: 0.85;
+  text-decoration: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.feature-card-cta-primary:hover {
+  transform: translateY(-2px);
+  opacity: 0.92;
+}
+.feature-card-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1.5px solid color-mix(in srgb, var(--color-success-text) 35%, transparent);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--color-success-text);
+  padding: 0.6rem 1.15rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.feature-card-cta-secondary:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 /* ── Closing CTA band ── */
@@ -760,7 +761,7 @@ html.lenis {
   .feature-card-cipher {
     display: none;
   }
-  .feature-card-trust-title {
+  .feature-card-cta-title {
     font-size: 1.2rem;
   }
 }

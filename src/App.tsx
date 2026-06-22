@@ -8,7 +8,6 @@ import { CampaignWizard } from "@/pages/CampaignWizard";
 import { CampaignDetail } from "@/pages/CampaignDetail";
 import { Claim } from "@/pages/Claim";
 import { ConnectButton } from "@/components/ConnectButton";
-import { Shield } from "@/components/Shield";
 
 export function App() {
   const { pathname } = useLocation();
@@ -42,13 +41,13 @@ function Wordmark({ light }: { light?: boolean }) {
   return (
     <Link
       to="/"
-      className="flex items-center gap-2.5 hover:opacity-80"
+      className="flex items-center gap-1.5 hover:opacity-80"
       style={{
         color: light ? "#fff" : "var(--color-ink)",
         transition: "color 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s ease",
       }}
     >
-      <Shield size={20} />
+      <img src="/illustrations/enveil-logo-2.svg" alt="Enveil Logo" className="h-6 w-auto" />
       <span className="font-wordmark text-base lowercase tracking-wider sm:text-lg">
         enveil
       </span>
