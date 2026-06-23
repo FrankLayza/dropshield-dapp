@@ -203,11 +203,8 @@ export function StepVesting({
         const { airdrop } = await withRelayerRetry(
           () =>
             createAndFund.mutateAsync({
-              token: tokenAddress as `0x${string}`,
               params,
               userSalt,
-              deployer: adminAddress,
-              gasFee: 0n,
               amount: poolTotals[t],
             }),
           `Unlock ${t + 1}`,

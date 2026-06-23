@@ -182,7 +182,7 @@ export function Dashboard() {
             avgRate={avgRate}
           />
 
-          <Reveal.Stagger className="space-y-3">
+          <Reveal.Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {list.map((c) => (
               <Reveal.Item key={c.address}>
                 <CampaignCard campaign={c} claimed={byAddress[c.address.toLowerCase()]} />

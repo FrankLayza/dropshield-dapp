@@ -10,6 +10,7 @@ import {
 } from "@tokenops/sdk/fhe-airdrop/react";
 import { formatTokens, shortAddress, TOKEN_DECIMALS } from "@/lib/recipients";
 import { ConfidentialBalance } from "@/components/ConfidentialBalance";
+import { VestingClaim, type VestingPayload } from "@/components/VestingClaim";
 
 // The Zama relayer and Sepolia RPC intermittently time out / fetch-fail. These
 // are transient and deserve a calm "try again" rather than a raw stack trace.
@@ -49,11 +50,26 @@ export function Claim() {
   const [showManualImport, setShowManualImport] = useState(false);
   const [pastedJson, setPastedJson] = useState("");
 
+  // Vesting payload (multi-tranche) — when present we render the vesting timeline
+  // instead of the single-claim flow.
+  const [vestingPayload, setVestingPayload] = useState<VestingPayload | null>(null);
+
   // 1) Parse parameters from URL hash if present
   useEffect(() => {
     const hash = window.location.hash.substring(1);
     if (!hash) return;
     try {
+      // Vesting links carry a JSON payload under `v=`.
+      const vMatch = hash.match(/(?:^|&)v=([^&]+)/);
+      if (vMatch) {
+        const parsed = JSON.parse(decodeURIComponent(vMatch[1]));
+        if (parsed && Array.isArray(parsed.t) && parsed.r) {
+          setVestingPayload(parsed as VestingPayload);
+          window.location.hash = "";
+          return;
+        }
+      }
+
       const params = new URLSearchParams(hash);
       const c = params.get("c");
       const r = params.get("r");
@@ -87,6 +103,33 @@ export function Claim() {
       setRevealHandle("");
 
       try {
+        // Vesting export: { type:"vesting", deliveries:[{address,label,totalAmount,tranches}] }
+        if (data?.type === "vesting" && Array.isArray(data.deliveries)) {
+          const mine =
+            (connectedAddress &&
+              data.deliveries.find(
+                (d: any) => d.address?.toLowerCase() === connectedAddress.toLowerCase(),
+              )) ||
+            data.deliveries[0];
+          if (mine) {
+            setVestingPayload({
+              r: mine.address,
+              l: mine.label ?? "",
+              total: mine.totalAmount,
+              t: (mine.tranches ?? []).map((tr: any) => ({
+                i: tr.index,
+                c: tr.campaignAddress,
+                u: tr.unlockTs,
+                a: tr.amount,
+                h: tr.encryptedInput?.handle ?? tr.h,
+                p: tr.encryptedInput?.inputProof ?? tr.p,
+                s: tr.signature ?? tr.s,
+              })),
+            });
+            return;
+          }
+        }
+
         const campaign = data.campaignAddress;
         let auth = null;
 
@@ -271,7 +314,9 @@ export function Claim() {
         </p>
       </div>
 
-      {!isLoaded ? (
+      {vestingPayload ? (
+        <VestingClaim payload={vestingPayload} onClear={() => setVestingPayload(null)} />
+      ) : !isLoaded ? (
         <div className="space-y-4">
           {/* Link-first empty state. Recipients arrive via a private claim link
               whose URL fragment auto-populates the claim — no upload needed. The

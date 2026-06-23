@@ -7,7 +7,7 @@ import {
   useClaim,
   useAirdropIsSignatureClaimed,
 } from "@tokenops/sdk/fhe-airdrop/react";
-import { formatTokens, shortAddress, toRawUnits, TOKEN_DECIMALS } from "@/lib/recipients";
+import { formatTokens, shortAddress, TOKEN_DECIMALS } from "@/lib/recipients";
 import { formatUnlockDate, isTrancheUnlocked } from "@/lib/vesting";
 
 const isTransientRelayerError = (msg: string) =>
@@ -97,6 +97,7 @@ export function VestingClaim({
           <TrancheRow
             key={t.c + t.i}
             tranche={t}
+            recipient={payload.r}
             position={i + 1}
             total={tranches.length}
             disabled={!isConnected || !!addressMismatch}
@@ -109,11 +110,13 @@ export function VestingClaim({
 
 function TrancheRow({
   tranche,
+  recipient,
   position,
   total,
   disabled,
 }: {
   tranche: ParsedTranche;
+  recipient: string;
   position: number;
   total: number;
   disabled: boolean;
@@ -127,7 +130,7 @@ function TrancheRow({
 
   const isClaimedQuery = useAirdropIsSignatureClaimed({
     address: tranche.c as `0x${string}`,
-    user: tranche.r as unknown as `0x${string}`, // not used; kept for shape
+    user: recipient as `0x${string}`,
     encryptedAmountHandle: (tranche.h as `0x${string}`) || undefined,
   });
   const alreadyClaimed = isClaimedQuery.data === true;
