@@ -25,7 +25,7 @@ const USE_CASES = [
   {
     title: "Investor Distributions",
     tagline: "Cap-table privacy, on-chain.",
-    body: "Token distributions expose each investor's allocation to the public. Enveil delivers them privately — every recipient verifies their own share without revealing the total or the list.",
+    body: "Token distributions expose each investor's allocation to the public. Enveil delivers them privately — every recipient reveals their own share without exposing the total or the list.",
     bestFor: "token distributions, SAFT payouts",
     illustration: "/illustrations/no-roster.png",
     bg: "#DFD1F4",
@@ -35,7 +35,7 @@ const USE_CASES = [
   {
     title: "Community Rewards",
     tagline: "Reward members without a public leaderboard.",
-    body: "Airdrops put every reward amount on display forever. Enveil encrypts allocations on-chain — members claim and verify their own, and nobody else's.",
+    body: "Airdrops put every reward amount on display forever. Enveil encrypts allocations on-chain — members reveal and claim their own, and nobody else's.",
     bestFor: "community airdrops, contributor bonuses",
     illustration: "/illustrations/verify-before-claim.png",
     bg: "#DFF3F6",

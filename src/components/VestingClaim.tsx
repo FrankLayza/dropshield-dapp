@@ -81,7 +81,7 @@ export function VestingClaim({
           <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-danger">
             <p className="font-semibold">Wrong wallet connected</p>
             <p className="mt-0.5">
-              Connect {shortAddress(payload.r)} to verify and claim these unlocks.
+              Connect {shortAddress(payload.r)} to reveal and claim these unlocks.
             </p>
           </div>
         )}
@@ -165,8 +165,8 @@ function TrancheRow({
     const msg = decryptQuery.error.message || "";
     setErrorMsg(
       isTransientRelayerError(msg)
-        ? "Relayer is slow — wait a moment and verify again."
-        : msg || "Decryption failed.",
+        ? "Secure service is slow — wait a moment and try again."
+        : msg || "Reveal failed.",
     );
   }, [decryptQuery.error]);
 
@@ -185,7 +185,7 @@ function TrancheRow({
       const msg = (err?.message ?? String(err)) + " " + (err?.cause?.message ?? "");
       setErrorMsg(
         isTransientRelayerError(msg)
-          ? "Network slow (relayer/RPC). Wait a moment and verify again."
+          ? "Network slow. Wait a moment and try again."
           : err?.message || "Reveal failed.",
       );
     }
@@ -236,7 +236,7 @@ function TrancheRow({
                 <AmountReveal raw={decryptedAmount} /> tokens
               </span>
             ) : (
-              <span className="font-mono text-sm tracking-widest text-faint select-none" title="Encrypted — verify to reveal">
+              <span className="font-mono text-sm tracking-widest text-faint select-none" title="Private allocation — click below to reveal">
                 •••••• tokens
               </span>
             )}
@@ -266,7 +266,7 @@ function TrancheRow({
                 disabled={disabled || isRevealing}
                 className="rounded-lg border border-emerald-300 bg-emerald-50 px-3.5 py-2 text-xs font-semibold text-emerald-700 transition-all hover:bg-emerald-100 disabled:opacity-50"
               >
-                {isRevealing ? "Verifying…" : "Decrypt & verify"}
+                {isRevealing ? "Revealing…" : "Reveal & show amount"}
               </button>
             ) : (
               <button

@@ -210,7 +210,7 @@ export function StepFund({
           <svg className="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           <div>
             Low on Sepolia ETH. Creating + funding a campaign costs roughly <span className="font-mono font-bold">~0.05 ETH</span> in
-            gas (FHE operations are heavy). Top up before funding, or the transaction may fail with "insufficient funds."
+            gas (cryptographic privacy operations require more gas). Top up before funding, or the transaction may fail with "insufficient funds."
           </div>
         </div>
       )}

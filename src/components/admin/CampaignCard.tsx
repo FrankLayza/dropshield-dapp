@@ -285,7 +285,7 @@ export function CampaignCard({
       {}
       <div className="mt-auto px-5 pb-4 flex items-center justify-between border-t border-edge/20 pt-3 text-[10px] text-faint font-mono">
         <div>
-          Created {fmtDate(startTime)} • FHE Secure
+          Created {fmtDate(startTime)} • Secure & Private
         </div>
         <button
           onClick={handleCopy}

@@ -41,7 +41,7 @@ export function ConfidentialBalance({ tokenAddress }: { tokenAddress?: `0x${stri
     <div className="rounded-xl border border-edge bg-panel p-4 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <div>
-          <p className="text-sm font-semibold text-ink">Your confidential balance</p>
+          <p className="text-sm font-semibold text-ink">Your private balance</p>
           <p className="mt-0.5 font-mono text-xs text-faint">
             {address ? shortAddress(address) : "—"} · cmUSD
           </p>
@@ -70,13 +70,13 @@ export function ConfidentialBalance({ tokenAddress }: { tokenAddress?: `0x${stri
           {balanceQuery.isPending ? (
             <div className="flex items-center gap-2 text-sm text-mute">
               <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gold-dim/30 border-t-gold-dim" />
-              {isRetrying ? `Relayer slow — retrying (${balanceQuery.failureCount})…` : "Decrypting your balance…"}
+              {isRetrying ? `Secure service slow — retrying (${balanceQuery.failureCount})…` : "Revealing your balance…"}
             </div>
           ) : balanceQuery.isError ? (
             <p className="text-xs text-danger">
               {/timed out|fetch|relayer|network|worker/i.test(balanceQuery.error?.message || "")
-                ? "The Zama relayer is slow right now. Click Retry in a moment."
-                : balanceQuery.error?.message || "Could not decrypt balance."}
+                ? "The secure reveal service is slow right now. Click Retry in a moment."
+                : balanceQuery.error?.message || "Could not reveal balance."}
             </p>
           ) : (
             <div className="flex items-baseline gap-2">
@@ -87,7 +87,7 @@ export function ConfidentialBalance({ tokenAddress }: { tokenAddress?: `0x${stri
             </div>
           )}
           <p className="mt-2 text-xs text-faint">
-            Decrypted locally with your wallet signature — visible only to you.
+            Revealed locally with your wallet signature — visible only to you.
           </p>
         </div>
       )}

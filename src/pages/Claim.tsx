@@ -242,8 +242,8 @@ export function Claim() {
     const msg = decryptQuery.error.message || "";
     setErrorMsg(
       isTransientRelayerError(msg)
-        ? "The Zama relayer is unresponsive right now. Wait a moment and click Decrypt again."
-        : msg || "Decryption failed.",
+        ? "The secure reveal service is unresponsive right now. Wait a moment and try again."
+        : msg || "Reveal failed.",
     );
   }, [decryptQuery.error]);
 
@@ -271,7 +271,7 @@ export function Claim() {
       const msg = (err?.message ?? String(err)) + " " + (err?.cause?.message ?? "");
       setErrorMsg(
         isTransientRelayerError(msg)
-          ? "The network is slow right now (relayer/RPC). Wait a moment and click Decrypt & Verify again."
+          ? "The network is slow right now. Wait a moment and click Reveal again."
           : err?.message || "Reveal failed.",
       );
     }
@@ -310,7 +310,7 @@ export function Claim() {
           Claim your tokens
         </h1>
         <p className="text-sm text-mute mt-1">
-          Import your signed authorization payload, decrypt to verify the amount privately, and claim.
+          Import your signed authorization payload, reveal the amount privately, and claim.
         </p>
       </div>
 
@@ -485,7 +485,7 @@ export function Claim() {
                 {decryptedAmount === null ? (
                   <span
                     className="font-mono font-medium tracking-widest text-faint select-none"
-                    title="Encrypted on-chain — decrypt to reveal"
+                    title="Private on-chain — click below to reveal"
                   >
                     •••••• tokens
                   </span>
@@ -502,9 +502,9 @@ export function Claim() {
               <div className="flex items-center gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800 text-sm">
                 <span className="text-lg">🛡️</span>
                 <div>
-                  <p className="font-semibold">Cryptographically Verified</p>
+                  <p className="font-semibold">Securely Verified</p>
                   <p className="text-xs opacity-90">
-                    The on-chain ciphertext decrypts to {formatTokens(decryptedAmount)} tokens
+                    Your private allocation is {formatTokens(decryptedAmount)} tokens
                     {plaintextAmount ? " — matching the amount your sender committed" : ""}.
                   </p>
                 </div>
@@ -559,10 +559,10 @@ export function Claim() {
                 {decryptedAmount === null && (
                   <div className="space-y-2.5">
                     <h3 className="text-sm font-semibold text-ink">
-                      1. Cryptographically Verify Amount
+                      1. Securely Reveal Amount
                     </h3>
                     <p className="text-xs text-mute">
-                      Triggers a transaction to authorize decyption of your FHE ciphertext. You then sign a relayer request to decrypt the amount locally.
+                      Triggers a secure request to reveal your allocation. You will approve a signature in your wallet to view the amount privately.
                     </p>
                     <button
                       onClick={handleReveal}
@@ -570,10 +570,10 @@ export function Claim() {
                       className="w-full rounded-lg border border-gold/40 bg-gold/5 py-2.5 text-sm font-semibold text-gold-dim transition-all hover:bg-gold/10 disabled:opacity-60"
                     >
                       {isDecryptRetrying
-                        ? `Relayer slow — retrying (${decryptQuery.failureCount})…`
+                        ? `Secure service slow — retrying (${decryptQuery.failureCount})…`
                         : isRevealing
-                          ? "Revealing & decrypting…"
-                          : "Decrypt & Verify Allocation"}
+                          ? "Revealing allocation…"
+                          : "Reveal Allocation"}
                     </button>
                   </div>
                 )}
@@ -585,8 +585,8 @@ export function Claim() {
                   </h3>
                   <p className="text-xs text-mute">
                     {decryptedAmount === null
-                      ? "Verify your allocation above to unlock claiming."
-                      : "Consumes your claim signature and transfers the encrypted tokens directly to your wallet."}
+                      ? "Reveal your allocation above to unlock claiming."
+                      : "Consumes your claim signature and transfers the tokens directly to your wallet."}
                   </p>
                   <button
                     onClick={handleClaim}
@@ -596,7 +596,7 @@ export function Claim() {
                     {claimMutation.isPending
                       ? "Claiming..."
                       : decryptedAmount === null
-                        ? "Verify to unlock"
+                        ? "Reveal to unlock"
                         : "Claim Allocation"}
                   </button>
                 </div>

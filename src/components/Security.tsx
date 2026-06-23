@@ -4,13 +4,13 @@ import { Reveal } from "@/components/Reveal";
 
 const PROPERTIES = [
   {
-    title: "On-chain encryption",
-    body: "Amounts are FHE ciphertexts on Sepolia. Not obfuscated, not off-chain — mathematically unreadable, on the public chain.",
+    title: "Secure on-chain shielding",
+    body: "Amounts are securely locked on the blockchain. Not obfuscated, not off-chain — mathematically unreadable by anyone on the public chain.",
     icon: CipherIcon,
   },
   {
-    title: "Recipient-only decryption",
-    body: "Only the intended wallet can decrypt its own allocation. The key is tied to the address — not held by the sender or anyone else.",
+    title: "Recipient-only access",
+    body: "Only the intended wallet can reveal its own allocation. The key is tied directly to the wallet address — not held by the sender or anyone else.",
     icon: KeyIcon,
   },
   {
@@ -43,7 +43,7 @@ export function Security() {
             On a public blockchain, “private” usually means obfuscated — mixers,
             or amounts stashed off-chain. Enveil is different. Every allocation is
             encrypted before it leaves your browser, and the contract processes it
-            without ever decrypting it. There is no moment where the amount is
+            without ever exposing it. There is no moment where the amount is
             readable.
           </p>
         </Reveal>

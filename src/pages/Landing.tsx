@@ -10,7 +10,7 @@ import { Security } from "@/components/Security";
 
 
 const TRUST = [
-  "Zama FHE",
+  "Zama Protocol",
   "TokenOps SDK",
   "OpenZeppelin Audited",
   "ERC-7984",
@@ -133,9 +133,9 @@ export function Landing() {
               margin: "0 auto 2.25rem",
             }}
           >
-            Enveil encrypts every allocation on-chain with Fully Homomorphic
-            Encryption. Your contributors verify and claim only their own grant
-            — amounts stay confidential from everyone else. Forever.
+            Enveil secures every allocation on-chain. Your contributors
+            reveal and claim only their own private grant — amounts stay
+            confidential from everyone else. Forever.
           </p>
 
           {}

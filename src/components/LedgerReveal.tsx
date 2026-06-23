@@ -66,7 +66,7 @@ export function LedgerReveal() {
             Airdrop ledger · Sepolia
           </span>
           <span className="inline-flex items-center gap-1.5 font-mono text-xs text-faint">
-            <LockIcon /> FHE
+            <LockIcon /> SECURE
           </span>
         </div>
 
@@ -115,7 +115,7 @@ export function LedgerReveal() {
         {}
         <div className="border-t border-edge px-5 py-3">
           <p className="text-xs text-mute">
-            Amounts are encrypted on-chain.{" "}
+            Amounts are private on-chain.{" "}
             <span className="text-gold-dim">Only your row is yours.</span>
           </p>
         </div>

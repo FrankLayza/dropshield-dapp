@@ -182,7 +182,7 @@ export function StepDeliver({
           <p className="text-xs text-ink/60 mt-1">
             {isVesting
               ? `Each link carries the grantee's full unlock schedule — amounts stay encrypted. Share one link per ${noun}; tranches unlock automatically on their dates.`
-              : "Amounts are private and never go on-chain. Share each private claim link with the matching " + noun + " — they open it to verify and claim."}
+              : "Amounts are private and never go on-chain. Share each private claim link with the matching " + noun + " — they open it to reveal and claim."}
           </p>
         </div>
 
