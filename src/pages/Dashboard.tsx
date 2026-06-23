@@ -31,7 +31,7 @@ export function Dashboard() {
 
   const activeCount = list.filter((c) => c.status === "active").length;
 
-  // Average claim rate over campaigns with a known denominator + loaded count.
+  
   const rated = list.filter(
     (c) =>
       c.totalRecipients &&
@@ -51,7 +51,7 @@ export function Dashboard() {
 
   return (
     <div>
-      {/* Header */}
+      {}
       <header className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-ink">Campaigns</h1>
@@ -62,7 +62,7 @@ export function Dashboard() {
         {isConnected && <NewCampaignButton />}
       </header>
 
-      {/* Not connected */}
+      {}
       {!isConnected ? (
         <div className="rounded-2xl border border-violet-edge bg-violet-tint/40 px-6 py-14 text-center">
           <h2 className="font-display text-lg font-semibold text-ink">Connect your wallet</h2>
@@ -162,7 +162,7 @@ export function Dashboard() {
           </div>
         </div>
       ) : list.length === 0 ? (
-        /* Empty state */
+        
         <div className="rounded-2xl border border-edge bg-panel px-6 py-16 text-center">
           <h2 className="font-display text-lg font-semibold text-ink">No campaigns yet</h2>
           <p className="mx-auto mt-1.5 max-w-sm text-sm text-mute">
@@ -173,7 +173,7 @@ export function Dashboard() {
           </div>
         </div>
       ) : (
-        /* Populated */
+        
         <div className="space-y-8">
           <DashboardMetrics
             campaignsCount={list.length}

@@ -1,15 +1,14 @@
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import type { ReactNode } from "react";
 
-/**
+/* *
  * Reveal — scroll-into-view animation primitive (framer-motion).
  *
  * <Reveal> fades + lifts a block when it scrolls into view (one-shot).
  * <Reveal.Stagger> + <Reveal.Item> animate children in sequence.
  *
  * Respects prefers-reduced-motion (renders instantly, no transform).
- * Uses `whileInView` so it works on any section without manual observers.
- */
+ * Uses `whileInView` so it works on any section without manual observers. */
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function Reveal({

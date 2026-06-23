@@ -4,7 +4,7 @@ import { parseAbiItem, type Address, type PublicClient, type AbiEvent } from "vi
 import { getFheAirdropFactoryAddress } from "@tokenops/sdk";
 import { env } from "@/lib/env";
 import { TOKENOPS_AIRDROP_FACTORY_SEPOLIA } from "@/lib/addresses";
-import { getStoredCampaign } from "@/lib/campaigns";
+import { getStoredCampaign, getHiddenTrancheAddresses } from "@/lib/campaigns";
 import type { CampaignType } from "@/lib/recipients";
 
 /* ── Event ABIs (inline; mirrors StepFund's literal-ABI style — no SDK ABI dep) ── */
@@ -29,10 +29,10 @@ export interface MergedCampaign {
   admin: Address;
   startTime: number;
   endTime: number;
-  /** Block of the creation log — used as fromBlock for claim-count scans. */
+  
   creationBlock: bigint;
   status: CampaignStatus;
-  /** From localStorage (off-chain); undefined for campaigns recovered elsewhere. */
+  
   name?: string;
   campaignType?: CampaignType;
   totalRecipients?: number;
@@ -44,15 +44,14 @@ function resolveFactory(chainId: number): Address {
     TOKENOPS_AIRDROP_FACTORY_SEPOLIA) as Address;
 }
 
-/**
+/* *
  * Default block window to scan when VITE_FACTORY_FROM_BLOCK isn't set. RPCs cap
  * `eth_getLogs` ranges (Alchemy free ~10 blocks, publicnode 50k, etc.), so we
  * always chunk — this just bounds how far back we look. ~500k Sepolia blocks ≈
- * a couple months, covering this dApp's whole lifetime.
- */
+ * a couple months, covering this dApp's whole lifetime. */
 const DEFAULT_LOOKBACK_BLOCKS = 500_000n;
 
-/**
+/* *
  * Per-request block span + concurrency, tuned to the configured RPC — because no
  * single value fits both worlds:
  *   • Alchemy free tier caps eth_getLogs at a ~2k block RANGE (400 above it) AND
@@ -60,18 +59,16 @@ const DEFAULT_LOOKBACK_BLOCKS = 500_000n;
  *   • Public nodes (publicnode etc.) allow ~50k ranges, so a BIG span means far
  *     fewer requests and no burst — small spans there just trip rate limits.
  * Ranges are inclusive (`CHUNK_SPAN + 1` blocks), so 1900 stays safely under 2k.
- * `getLogsRange`'s adaptive bisection remains the safety net for anything stricter.
- */
+ * `getLogsRange`'s adaptive bisection remains the safety net for anything stricter. */
 const IS_ALCHEMY = /alchemy\.com/i.test(env.rpcUrl);
 const CHUNK_SPAN = IS_ALCHEMY ? 1_900n : 9_000n;
 const SCAN_CONCURRENCY = IS_ALCHEMY ? 2 : 3;
 
-/**
+/* *
  * Public RPCs (publicnode et al.) rate-limit a burst of getLogs with 403/429 or
  * a timeout. Retry transient failures with exponential backoff so a brief throttle
  * self-heals instead of failing the whole dashboard. getLogs is a pure read — safe
- * to retry. Non-transient errors (bad params, range too large) throw immediately.
- */
+ * to retry. Non-transient errors (bad params, range too large) throw immediately. */
 function isTransientRpcError(err: unknown): boolean {
   const msg = String((err as Error)?.message ?? err).toLowerCase();
   return (
@@ -97,8 +94,8 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 5, baseDelayMs = 70
     } catch (err) {
       lastErr = err;
       if (i === attempts - 1 || !isTransientRpcError(err)) throw err;
-      // Exponential backoff (capped) + jitter to desync concurrent scans and ride
-      // out rate-limit windows (429) instead of hammering.
+      
+      
       const delay = Math.min(baseDelayMs * 2 ** i, 8000) + Math.floor(Math.random() * 350);
       await new Promise((r) => setTimeout(r, delay));
     }
@@ -106,7 +103,7 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 5, baseDelayMs = 70
   throw lastErr;
 }
 
-/** Resolve the [fromBlock, latest] window to scan, honoring the env override. */
+
 async function resolveWindow(client: PublicClient): Promise<[bigint, bigint]> {
   const latest = await client.getBlockNumber();
   const from =
@@ -118,7 +115,7 @@ async function resolveWindow(client: PublicClient): Promise<[bigint, bigint]> {
   return [from, latest];
 }
 
-/**
+/* *
  * A range/response-size rejection — structurally distinct from a transient
  * throttle. The request is simply too big for this provider (e.g. drpc free's
  * "ranges over 10000 blocks", Alchemy's 2k cap), so splitting the range helps.
@@ -127,11 +124,10 @@ async function resolveWindow(client: PublicClient): Promise<[bigint, bigint]> {
  * personal token", missing-API-key) are NOT range errors — splitting them just
  * re-fails on every sub-range and storms the RPC. Exclude those explicitly, and
  * match on specific size/range PHRASES rather than bare JSON-RPC codes (codes
- * like -32602 are also used for auth/param errors).
- */
+ * like -32602 are also used for auth/param errors). */
 function isRangeLimitError(err: unknown): boolean {
   const msg = String((err as Error)?.message ?? err).toLowerCase();
-  // Auth / policy / availability — never bisect these.
+  
   if (
     msg.includes("personal token") ||
     msg.includes("api key") ||
@@ -156,17 +152,10 @@ function isRangeLimitError(err: unknown): boolean {
   );
 }
 
-/** Hard backstop on bisection recursion, so a misclassified error can't explode
- *  into thousands of requests. 8 levels splits a 9k chunk down to ~35 blocks. */
+
 const MAX_BISECT_DEPTH = 8;
 
-/**
- * getLogs for one [from, to] range: retries transient throttles (via withRetry)
- * and, if the provider rejects the range as too large, bisects and recurses.
- * This discovers whatever cap the endpoint enforces instead of hard-coding it,
- * so it works on drpc (10k), Alchemy free (2k), or anything in between. Auth and
- * policy errors are never bisected (see isRangeLimitError); depth is capped.
- */
+
 async function getLogsRange<TEvent extends AbiEvent>(
   client: PublicClient,
   filter: { address: Address; event: TEvent; args?: Record<string, unknown> },
@@ -198,7 +187,7 @@ async function getLogsRange<TEvent extends AbiEvent>(
   }
 }
 
-/** Map over items with a bounded number of concurrent workers, preserving order. */
+
 async function mapWithConcurrency<T, R>(
   items: T[],
   limit: number,
@@ -216,12 +205,11 @@ async function mapWithConcurrency<T, R>(
   return out;
 }
 
-/**
+/* *
  * Scan `getLogs` for a single event across a block window. Splits the window into
  * fixed chunks, fetches them with bounded concurrency, and lets `getLogsRange`
  * adaptively bisect any chunk the RPC rejects. Generic over the event so each
- * returned log keeps its decoded `.args`.
- */
+ * returned log keeps its decoded `.args`. */
 async function scanLogs<TEvent extends AbiEvent>(
   client: PublicClient,
   filter: { address: Address; event: TEvent; args?: Record<string, unknown> },
@@ -240,12 +228,7 @@ async function scanLogs<TEvent extends AbiEvent>(
   return chunks.flat() as LogItem[];
 }
 
-/**
- * List the connected admin's campaigns from factory `ConfidentialAirdropCreated`
- * logs (the `admin` topic is indexed, so this filters server-side and works on
- * any device). Merges off-chain metadata (name/type/totalRecipients) from
- * localStorage. Sorted newest first.
- */
+
 export function useMyCampaigns(admin?: string): UseQueryResult<MergedCampaign[], Error> {
   const publicClient = usePublicClient();
   const chainId = useChainId();
@@ -268,7 +251,13 @@ export function useMyCampaigns(admin?: string): UseQueryResult<MergedCampaign[],
         latest,
       );
 
-      const campaigns: MergedCampaign[] = logs.map((log) => {
+      
+      
+      const hiddenTranches = getHiddenTrancheAddresses(admin as string);
+
+      const campaigns: MergedCampaign[] = logs
+        .filter((log) => !hiddenTranches.has(String(log.args.airdrop ?? "").toLowerCase()))
+        .map((log) => {
         const a = log.args;
         const address = (a.airdrop as Address) ?? ("0x" as Address);
         const start = Number(a.startTime ?? 0);
@@ -288,16 +277,13 @@ export function useMyCampaigns(admin?: string): UseQueryResult<MergedCampaign[],
         };
       });
 
-      // Newest first (by creation block).
+      
       return campaigns.sort((x, y) => Number(y.creationBlock - x.creationBlock));
     },
   });
 }
 
-/**
- * Count `Claimed` events for one campaign (privacy-safe — count only, no
- * amounts). Polls every 20s only while the campaign is active.
- */
+
 export function useClaimCount(
   address?: Address,
   fromBlock?: bigint,
@@ -326,17 +312,14 @@ export function useClaimCount(
 }
 
 export interface CampaignClaimCounts {
-  /** Map of lowercased campaign address → claim count (undefined while loading). */
+  
   byAddress: Record<string, number | undefined>;
-  /** Sum of all known counts. */
+  
   totalClaims: number;
   isLoading: boolean;
 }
 
-/**
- * Claim counts for a whole list of campaigns (powers the dashboard stat cards).
- * Shares queryKeys with useClaimCount so per-card reads dedupe automatically.
- */
+
 export function useCampaignClaimCounts(campaigns: MergedCampaign[]): CampaignClaimCounts {
   const publicClient = usePublicClient();
   const chainId = useChainId();

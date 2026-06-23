@@ -28,8 +28,8 @@ import {
   formatUnlockDate,
 } from "@/lib/vesting";
 
-// ERC-7984 setOperator — deadline is uint48. One-time approval; reused by every
-// tranche deploy.
+
+
 const erc7984SetOperatorAbi = [
   {
     type: "function",
@@ -61,14 +61,7 @@ const isTransientRelayerError = (msg: string) =>
     msg,
   );
 
-/**
- * StepVesting — vesting-only orchestrator that REPLACES the create/fund/authorize
- * steps. For an N-tranche schedule it runs:
- *   1× setOperator(factory)  →  N× createAndFund (one airdrop per dated tranche)
- *   →  N×R encrypt + sign authorizations.
- * Progress is tracked per tranche; relayer hiccups retry the encrypt/deploy.
- * Resumable: completed tranches are kept so a mid-run failure can continue.
- */
+
 export function StepVesting({
   tokenAddress,
   recipients,
@@ -109,8 +102,8 @@ export function StepVesting({
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  // Completed authorizations accumulated per recipient (lowercased address →
-  // their tranche auths). Survives a mid-run failure so Resume can continue.
+  
+  
   const [recipientAuths, setRecipientAuths] = useState<Record<string, VestingTrancheAuth[]>>({});
 
   const setState = (i: number, s: TrancheState) =>
@@ -149,10 +142,10 @@ export function StepVesting({
     setRunning(true);
 
     try {
-      // 1) One-time operator approval — lets the factory pull tokens for funding.
+      
       if (!operatorApproved) {
         setProgress("Approving the factory to move your tokens…");
-        const until = 2_000_000_000; // ~2033
+        const until = 2_000_000_000; 
         const hash = await writeContractAsync({
           address: tokenAddress as `0x${string}`,
           abi: erc7984SetOperatorAbi,
@@ -166,8 +159,8 @@ export function StepVesting({
         setOperatorApproved(true);
       }
 
-      // 2) For each not-yet-done tranche: deploy+fund, then authorize each
-      // recipient, pushing their auth into a per-recipient accumulator.
+      
+      
       const byRecipient = new Map<string, VestingTrancheAuth[]>(
         plans.map((p) => [
           p.recipient.address.toLowerCase(),
@@ -186,7 +179,7 @@ export function StepVesting({
           continue;
         }
 
-        // Deploy + fund this tranche's pool.
+        
         setState(t, "deploying");
         setProgress(`Unlock ${t + 1}/${tranches.length}: deploying & funding…`);
         const params = {
@@ -196,7 +189,7 @@ export function StepVesting({
           canExtendClaimWindow,
           admin: adminAddress,
         };
-        // Unique salt per tranche so each gets a distinct clone address.
+        
         const saltSeed = (BigInt(startTs) * 1000n + BigInt(t)).toString(16).padStart(64, "0");
         const userSalt = `0x${saltSeed}` as `0x${string}`;
 
@@ -211,7 +204,7 @@ export function StepVesting({
         );
         if (!firstCampaign) firstCampaign = airdrop;
 
-        // Authorize each recipient for their slice of this tranche.
+        
         setState(t, "authorizing");
         for (let r = 0; r < plans.length; r++) {
           const plan = plans[r];
@@ -244,12 +237,12 @@ export function StepVesting({
           });
         }
 
-        // Persist progress after each completed tranche (enables Resume).
+        
         setRecipientAuths(Object.fromEntries(byRecipient));
         setState(t, "done");
       }
 
-      // 3) Build per-recipient deliveries (tranches sorted by unlock order).
+      
       const deliveries: VestingRecipientDelivery[] = plans.map((plan) => {
         const mine = [...(byRecipient.get(plan.recipient.address.toLowerCase()) ?? [])].sort(
           (a, b) => a.index - b.index,

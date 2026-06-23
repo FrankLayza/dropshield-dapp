@@ -7,13 +7,7 @@ import { Features } from "@/components/Features";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Security } from "@/components/Security";
 
-/* ── Landing ─────────────────────────────────────────────────────────────────
-   B2B marketing page, "Bankyz" blueprint restyled to Enveil (light + violet).
-   Seven stacked sections, plain top-to-bottom scroll:
-     hero → trust bar → how it works → use cases → security → final CTA → footer.
-   One selling point throughout: token grants are permanently public on-chain;
-   Enveil makes them private. The custom cursor is scoped to this page only
-   (body.landing-cursor, toggled below). */
+
 
 const TRUST = [
   "Zama FHE",
@@ -27,15 +21,15 @@ export function Landing() {
   const heroRef = useRef<HTMLElement>(null);
   const lenis = useLenis();
 
-  // Scope the custom cursor to the landing page only — added on mount, removed
-  // on unmount so /admin and /claim restore the normal system cursor.
+  
+  
   useEffect(() => {
     document.body.classList.add("landing-cursor");
     return () => document.body.classList.remove("landing-cursor");
   }, []);
 
-  // Hero entrance: eyebrow → title → sub → cta → cards. useLayoutEffect so the
-  // from-state is set before paint (no flash). Honors reduced-motion.
+  
+  
   useLayoutEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const ctx = gsap.context(() => {
@@ -51,12 +45,12 @@ export function Landing() {
 
   return (
     <div className="relative">
-      {/* ── 1 · HERO ───────────────────────────────────────────────────────── */}
+      {}
       <section
         ref={heroRef}
         className="relative overflow-hidden pt-40 pb-24 text-center min-h-[90vh] flex items-center justify-center bg-[url('/illustrations/hero-bg.png')] bg-center bg-no-repeat bg-[length:auto_100%] md:bg-cover"
       >
-        {/* Dark overlay for text contrast */}
+        {}
         <div
           aria-hidden
           style={{
@@ -67,7 +61,7 @@ export function Landing() {
           }}
         />
 
-        {/* Content column */}
+        {}
         <div
           style={{
             position: "relative",
@@ -77,7 +71,7 @@ export function Landing() {
             padding: "0 1.5rem",
           }}
         >
-          {/* Eyebrow pill */}
+          {}
           <span
             className="js-eyebrow"
             style={{
@@ -110,7 +104,7 @@ export function Landing() {
             Confidential token distribution
           </span>
 
-          {/* Headline */}
+          {}
           <h1
             className="js-title mx-auto mb-6 max-w-3xl font-display font-extrabold leading-[1.04] tracking-tight text-white text-[clamp(2.15rem,6vw,4.5rem)]"
           >
@@ -128,7 +122,7 @@ export function Landing() {
             </span>
           </h1>
 
-          {/* Subtext */}
+          {}
           <p
             className="js-sub"
             style={{
@@ -144,7 +138,7 @@ export function Landing() {
             — amounts stay confidential from everyone else. Forever.
           </p>
 
-          {/* CTAs */}
+          {}
           <div
             className="js-cta"
             style={{
@@ -220,7 +214,7 @@ export function Landing() {
         </div>
       </section>
 
-      {/* ── 2 · TRUST BAR ──────────────────────────────────────────────────── */}
+      {}
       <div className="mx-auto max-w-6xl border-t border-edge px-4 py-10 sm:px-6">
         <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-faint">
           Built on audited, open infrastructure
@@ -238,16 +232,16 @@ export function Landing() {
         </div>
       </div>
 
-      {/* ── 3 · HOW IT WORKS ───────────────────────────────────────────────── */}
+      {}
       <HowItWorks />
 
-      {/* ── 4 · USE CASES ──────────────────────────────────────────────────── */}
+      {}
       <Features />
 
-      {/* ── 5 · SECURITY ───────────────────────────────────────────────────── */}
+      {}
       <Security />
 
-      {/* ── 6 · FINAL CTA ──────────────────────────────────────────────────── */}
+      {}
       <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         <div
           className="flex flex-col items-start gap-6 rounded-3xl border border-violet-edge p-9 sm:flex-row sm:items-center sm:justify-between sm:p-12"
@@ -287,13 +281,13 @@ export function Landing() {
         </div>
       </section>
 
-      {/* ── 7 · FOOTER ─────────────────────────────────────────────────────── */}
+      {}
       <Footer />
     </div>
   );
 }
 
-/* ── Hand-drawn underline beneath the highlighted phrase ────────────────── */
+
 function UnderlineSquiggle() {
   return (
     <svg

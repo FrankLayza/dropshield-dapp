@@ -14,19 +14,16 @@ import type { VestingSchedule } from "@/lib/vesting";
 
 type SchedulePartial = Omit<VestingSchedule, "startTs">;
 
-// Unique row id. Must NOT be a module-level counter — Vite HMR resets it to 0,
-// so newly added rows would reuse ids (r0, r1…) already held in parent state,
-// producing duplicate React keys (typed values render against the wrong row).
+
+
+
 let _seq = 0;
 const newId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
     ? `r-${crypto.randomUUID()}`
     : `r-${Date.now().toString(36)}-${_seq++}`;
 
-/**
- * Step 1 — Recipients. CSV dropzone + editable table + live total.
- * Pure frontend: no chain calls, no relayer. Emits a clean recipient list upward.
- */
+
 export function StepRecipients({
   recipients,
   setRecipients,
@@ -66,7 +63,7 @@ export function StepRecipients({
     (text: string) => {
       const parsed = parseRecipientsCsv(text, newId);
       if (parsed.length) {
-        // Replace placeholder-empty rows; otherwise append.
+        
         const existing = recipients.filter((r) => r.address.trim() || r.amount.trim());
         setRecipients([...existing, ...parsed]);
       }
@@ -100,7 +97,7 @@ export function StepRecipients({
         </p>
       </div>
 
-      {/* Campaign name — off-chain label shown on the dashboard. */}
+      {}
       <div className="mb-6">
         <label className="block text-xs font-medium uppercase tracking-wider text-faint mb-1.5">
           Campaign name <span className="normal-case text-faint/70">(optional)</span>
@@ -113,12 +110,12 @@ export function StepRecipients({
         />
       </div>
 
-      {/* Campaign type — display-only framing for the whole wizard. */}
+      {}
       <div className="mb-6">
         <CampaignTypeSelector value={campaignType} onChange={setCampaignType} />
       </div>
 
-      {/* Dropzone */}
+      {}
       <label
         onDragOver={(e) => {
           e.preventDefault();
@@ -152,7 +149,7 @@ export function StepRecipients({
         </p>
       </label>
 
-      {/* Table */}
+      {}
       <div className="mt-6 overflow-hidden rounded-xl border border-edge bg-panel shadow-sm">
         <div className="hidden sm:grid grid-cols-[1fr_170px_120px_40px] items-center gap-3 border-b border-edge bg-panel-2 px-4 py-3">
           <span className="text-xs font-medium uppercase tracking-wider text-faint">
@@ -258,7 +255,7 @@ export function StepRecipients({
         )}
       </div>
 
-      {/* Add row */}
+      {}
       {recipients.length > 0 && (
         <button
           onClick={addRow}
@@ -268,8 +265,7 @@ export function StepRecipients({
         </button>
       )}
 
-      {/* Vesting-only: unlock schedule builder. Splits each recipient's total
-          across dated, confidential tranches. */}
+      {}
       {campaignType === "vesting" && (
         <div className="mt-6">
           <ScheduleBuilder
@@ -281,7 +277,7 @@ export function StepRecipients({
         </div>
       )}
 
-      {/* Footer: total + advance */}
+      {}
       <div className="mt-6 flex flex-col gap-4 border-t border-edge pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <p className="text-sm text-mute text-center sm:text-left">
           <span className="font-mono font-medium text-ink">{validCount}</span>{" "}
@@ -311,7 +307,7 @@ export function StepRecipients({
   );
 }
 
-/* ── icons (sized to their text) ───────────────────────────────────────── */
+
 function UploadIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-mute)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

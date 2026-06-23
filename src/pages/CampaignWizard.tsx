@@ -86,8 +86,8 @@ export function CampaignWizard() {
 
   const totalAmount = totalRawUnits(recipients);
 
-  // Persist off-chain metadata the moment the clone address is real — so the
-  // campaign shows on the dashboard even if the admin stops before delivering.
+  
+  
   const handleCreated = (addr: string) => {
     if (adminAddress) {
       saveCampaign({
@@ -106,14 +106,24 @@ export function CampaignWizard() {
     setCurrent(3);
   };
 
-  // Vesting: many tranche clones are deployed. We store the FIRST as the
-  // dashboard-representative campaign and keep the full per-recipient deliveries
-  // for the deliver step + claim links.
+  
+  
+  
   const handleVestingDeployed = (
     deliveries: VestingRecipientDelivery[],
     firstCampaign: string,
   ) => {
     if (adminAddress && firstCampaign) {
+      
+      
+      
+      const allTrancheAddrs = (deliveries[0]?.tranches ?? [])
+        .slice()
+        .sort((a, b) => a.index - b.index)
+        .map((t) => t.campaignAddress.toLowerCase());
+      const children = allTrancheAddrs.filter(
+        (addr) => addr !== firstCampaign.toLowerCase(),
+      );
       saveCampaign({
         address: firstCampaign.toLowerCase(),
         name: campaignName.trim(),
@@ -124,6 +134,8 @@ export function CampaignWizard() {
         endTimestamp,
         createdAt: Date.now(),
         admin: adminAddress.toLowerCase(),
+        trancheAddresses: children,
+        trancheCount: allTrancheAddrs.length,
       });
     }
     setVestingDeliveries(deliveries);
@@ -212,8 +224,7 @@ export function CampaignWizard() {
           />
         )}
 
-        {/* Vesting branches the middle of the wizard into a single deploy
-            orchestrator; standard campaigns keep the create→fund→authorize path. */}
+        {}
         {isVesting && current === 2 && (
           <StepVesting
             tokenAddress={tokenAddress}

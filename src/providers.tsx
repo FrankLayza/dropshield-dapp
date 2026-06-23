@@ -15,7 +15,7 @@ import { wagmiConfig } from "@/lib/wagmi";
 import { env } from "@/lib/env";
 import "@rainbow-me/rainbowkit/styles.css";
 
-/**
+/* *
  * Provider order matters — inner providers depend on outer context:
  *   WagmiProvider (wallet + chain)
  *     └ QueryClientProvider (async cache; required by both SDKs)
@@ -25,8 +25,7 @@ import "@rainbow-me/rainbowkit/styles.css";
  * `watchConnection` from wagmi, which only exists in wagmi v3 — but @tokenops/sdk
  * requires wagmi v2. So WagmiSigner is unusable here. ViemSigner is wagmi-version
  * agnostic: it reads the connected wallet client (from wagmi's useWalletClient)
- * plus a standalone Sepolia public client.
- */
+ * plus a standalone Sepolia public client. */
 const queryClient = new QueryClient();
 
 function ZamaSigned({ children }: { children: ReactNode }) {
@@ -48,8 +47,8 @@ function ZamaSigned({ children }: { children: ReactNode }) {
     [],
   );
 
-  // Rebuilds when the wallet connects / account changes. walletClient is
-  // undefined until connected — signing operations only run post-connect.
+  
+  
   const signer = useMemo(
     () => new ViemSigner({ walletClient: walletClient ?? undefined, publicClient }),
     [walletClient, publicClient],

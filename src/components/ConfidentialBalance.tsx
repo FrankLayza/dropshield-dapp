@@ -4,15 +4,14 @@ import { useConfidentialBalance } from "@zama-fhe/react-sdk";
 import { formatTokens, shortAddress } from "@/lib/recipients";
 import { env } from "@/lib/env";
 
-/**
+/* *
  * ConfidentialBalance — reveal the connected wallet's confidential cmUSD balance.
  *
  * A confidential ERC-7984 balance is encrypted on-chain (no wallet can display
  * it). The only way to see it is to decrypt it yourself — which is exactly what
  * this does: useConfidentialBalance reads the on-chain handle and decrypts via
  * the relayer (one EIP-712 signature). Lazy: only runs when the user clicks,
- * so we never force a signature prompt unprompted.
- */
+ * so we never force a signature prompt unprompted. */
 export function ConfidentialBalance({ tokenAddress }: { tokenAddress?: `0x${string}` }) {
   const { address, isConnected } = useAccount();
   const [revealed, setRevealed] = useState(false);

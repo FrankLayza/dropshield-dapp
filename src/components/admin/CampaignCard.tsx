@@ -14,12 +14,12 @@ interface CircularProgressProps {
 function CircularProgress({ percent, color }: CircularProgressProps) {
   const radius = 10;
   const strokeWidth = 2.5;
-  const circumference = 2 * Math.PI * radius; // ~62.83
+  const circumference = 2 * Math.PI * radius; 
   const strokeDashoffset = circumference - (percent / 100) * circumference;
 
   return (
     <svg className="h-8 w-8 -rotate-90 shrink-0" viewBox="0 0 24 24">
-      {/* Track */}
+      {}
       <circle
         cx="12"
         cy="12"
@@ -29,7 +29,7 @@ function CircularProgress({ percent, color }: CircularProgressProps) {
         strokeWidth={strokeWidth}
         className="opacity-25"
       />
-      {/* Indicator */}
+      {}
       <circle
         cx="12"
         cy="12"
@@ -95,14 +95,14 @@ export function CampaignCard({
         };
       case "vesting":
         return {
-          accent: "#059669", // emerald
+          accent: "#059669", 
           bg: "#d1fae5",
           imgKeyword: "clock shield token release vesting banner",
           typeLabel: "Vesting Schedule",
         };
       default:
         return {
-          accent: "#0891b2", // cyan
+          accent: "#0891b2", 
           bg: "#e0f7fa",
           imgKeyword: "abstract gift parcel rewards community banner",
           typeLabel: "Community Rewards",
@@ -141,7 +141,7 @@ export function CampaignCard({
         ["--card-accent-tint" as any]: theme.bg,
       }}
     >
-      {/* Header Banner */}
+      {}
       <div className="relative h-32 w-full overflow-hidden border-b border-edge/60 bg-panel-2">
         {!imgFailed ? (
           <img
@@ -157,7 +157,7 @@ export function CampaignCard({
               background: `linear-gradient(135deg, ${theme.bg}, var(--color-bg))`,
             }}
           >
-            {/* Abstract geometric graphic pattern */}
+            {}
             <div className="absolute right-4 top-4 opacity-15">
               <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1.5">
                 <circle cx="12" cy="12" r="10" />
@@ -168,7 +168,7 @@ export function CampaignCard({
           </div>
         )}
 
-        {/* Top-left Recipient Count Badge */}
+        {}
         <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-md bg-ink/75 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-xs">
           {totalRecipients !== undefined ? (
             <>
@@ -191,7 +191,7 @@ export function CampaignCard({
           )}
         </div>
 
-        {/* Top-right Status Pill */}
+        {}
         <div
           className={`absolute right-3 top-3 rounded-full border px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider backdrop-blur-xs ` +
             (status === "active"
@@ -205,7 +205,7 @@ export function CampaignCard({
         </div>
       </div>
 
-      {/* Campaign Details */}
+      {}
       <div className="px-5 pt-4">
         <h3 className="font-display text-base font-bold tracking-tight text-ink line-clamp-2 min-h-12">
           {name || shortAddress(address)}
@@ -213,9 +213,9 @@ export function CampaignCard({
         <p className="mt-0.5 font-mono text-[10px] text-faint">{shortAddress(address)}</p>
       </div>
 
-      {/* Metrics Row */}
+      {}
       <div className="mt-4 px-5 py-4 border-y border-edge/40 bg-panel-2/40 flex items-center divide-x divide-edge/60 gap-4">
-        {/* Left Metric: Claim Rate */}
+        {}
         <div className="flex-1 flex items-center gap-3">
           <CircularProgress percent={totalRecipients !== undefined && totalRecipients > 0 ? claimPercent : (claimedCount > 0 ? 100 : 0)} color="var(--card-accent)" />
           <div className="min-w-0">
@@ -248,7 +248,7 @@ export function CampaignCard({
           </div>
         </div>
 
-        {/* Right Metric: Time Window */}
+        {}
         <div className="flex-1 flex items-center gap-3 pl-4">
           <CircularProgress percent={timePercent} color="var(--card-accent)" />
           <div className="min-w-0">
@@ -260,7 +260,7 @@ export function CampaignCard({
         </div>
       </div>
 
-      {/* Tags and Action */}
+      {}
       <div className="px-5 py-3 flex items-center justify-between gap-3">
         <div className="flex flex-wrap gap-1.5">
           <span className="rounded bg-panel-2 px-2 py-0.5 text-[9px] font-bold text-mute uppercase tracking-wider border border-edge/60">
@@ -282,7 +282,7 @@ export function CampaignCard({
         </Link>
       </div>
 
-      {/* Footer info */}
+      {}
       <div className="mt-auto px-5 pb-4 flex items-center justify-between border-t border-edge/20 pt-3 text-[10px] text-faint font-mono">
         <div>
           Created {fmtDate(startTime)} • FHE Secure

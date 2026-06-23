@@ -1,8 +1,6 @@
 import { Reveal } from "@/components/Reveal";
 
-/* ── Security / How privacy works ───────────────────────────────────────────
-   Answers the implicit objection: "is this actually private, or just hidden?"
-   Full-width tinted band. Short, confident, doesn't oversell. */
+
 
 const PROPERTIES = [
   {
@@ -74,7 +72,7 @@ export function Security() {
   );
 }
 
-/* ── Icons ──────────────────────────────────────────────────────────────── */
+
 function CipherIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">

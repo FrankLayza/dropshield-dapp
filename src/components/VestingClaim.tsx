@@ -15,26 +15,25 @@ const isTransientRelayerError = (msg: string) =>
 
 export interface ParsedTranche {
   i: number;
-  c: string; // tranche airdrop address
-  u: number; // unlock unix seconds
-  a: string; // whole-token amount (integrity reference)
-  h: string; // encrypted handle
-  p: string; // input proof
-  s: string; // signature
+  c: string; 
+  u: number; 
+  a: string; 
+  h: string; 
+  p: string; 
+  s: string; 
 }
 
 export interface VestingPayload {
-  r: string; // recipient
-  l: string; // label
+  r: string; 
+  l: string; 
   total: string;
   t: ParsedTranche[];
 }
 
-/**
+/* *
  * VestingClaim — recipient view of a confidential vesting schedule. Renders a
  * timeline of dated tranches; each unlocked tranche can be independently
- * verified (FHE decrypt) and claimed. Locked tranches show their unlock date.
- */
+ * verified (FHE decrypt) and claimed. Locked tranches show their unlock date. */
 export function VestingClaim({
   payload,
   onClear,
@@ -53,7 +52,7 @@ export function VestingClaim({
 
   return (
     <div className="space-y-6 animate-step-in">
-      {/* Header card */}
+      {}
       <div className="rounded-2xl border border-edge bg-panel p-5 space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -91,7 +90,7 @@ export function VestingClaim({
         )}
       </div>
 
-      {/* Timeline */}
+      {}
       <ol className="relative space-y-3">
         {tranches.map((t, i) => (
           <TrancheRow
@@ -127,13 +126,17 @@ function TrancheRow({
   const [decryptedAmount, setDecryptedAmount] = useState<bigint | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  
+  
+  
+  const [claimedLocally, setClaimedLocally] = useState(false);
 
   const isClaimedQuery = useAirdropIsSignatureClaimed({
     address: tranche.c as `0x${string}`,
     user: recipient as `0x${string}`,
     encryptedAmountHandle: (tranche.h as `0x${string}`) || undefined,
   });
-  const alreadyClaimed = isClaimedQuery.data === true;
+  const alreadyClaimed = isClaimedQuery.data === true || claimedLocally;
 
   const revealMutation = useGetClaimAmount({ address: tranche.c as `0x${string}` });
   const claimMutation = useClaim({ address: tranche.c as `0x${string}` });
@@ -195,6 +198,8 @@ function TrancheRow({
         encryptedInput: { handle: tranche.h as `0x${string}`, inputProof: tranche.p as `0x${string}` },
         signature: tranche.s as `0x${string}`,
       });
+      setClaimedLocally(true);
+      setErrorMsg("");
       setSuccessMsg(`Claimed · ${hash.slice(0, 10)}…`);
       isClaimedQuery.refetch();
     } catch (err: any) {
@@ -202,7 +207,7 @@ function TrancheRow({
     }
   };
 
-  // Visual state
+  
   const state: "claimed" | "available" | "locked" = alreadyClaimed
     ? "claimed"
     : unlocked
@@ -211,7 +216,7 @@ function TrancheRow({
 
   return (
     <li className="relative flex gap-3 rounded-xl border border-edge bg-panel p-4 shadow-sm">
-      {/* connector line */}
+      {}
       {position < total && (
         <span className="absolute left-[34px] top-[52px] bottom-[-12px] w-px bg-edge" aria-hidden />
       )}
@@ -238,7 +243,7 @@ function TrancheRow({
           </div>
         </div>
 
-        {/* Actions */}
+        {}
         {state === "claimed" && (
           <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
@@ -275,7 +280,7 @@ function TrancheRow({
           </div>
         )}
 
-        {errorMsg && <p className="mt-2 text-xs text-danger">{errorMsg}</p>}
+        {errorMsg && state !== "claimed" && <p className="mt-2 text-xs text-danger">{errorMsg}</p>}
         {successMsg && <p className="mt-2 text-xs font-semibold text-emerald-700 break-all">{successMsg}</p>}
       </div>
     </li>
@@ -304,7 +309,7 @@ function Marker({ state, n }: { state: "claimed" | "available" | "locked"; n: nu
   );
 }
 
-/** Count-up reveal of a decrypted tranche amount (honors reduced motion). */
+
 function AmountReveal({ raw }: { raw: bigint }) {
   const reduceMotion = useReducedMotion();
   const target = Number(raw) / 10 ** TOKEN_DECIMALS;

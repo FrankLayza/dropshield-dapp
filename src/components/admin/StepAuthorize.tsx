@@ -58,7 +58,7 @@ export function StepAuthorize({
     const newStatuses = { ...statuses };
     const tempAuths = [...completedAuths];
 
-    // Find the first recipient that is not yet completed
+    
     const startIndex = recipients.findIndex(
       (r) => statuses[r.id] !== "done"
     );
@@ -68,7 +68,7 @@ export function StepAuthorize({
       setProgressText(`Processing recipient ${i + 1} of ${recipients.length}...`);
 
       try {
-        // Step 1: Encrypt
+        
         newStatuses[recipient.id] = "encrypting";
         setStatuses({ ...newStatuses });
         const rawUnits = toRawUnits(recipient.amount);
@@ -80,7 +80,7 @@ export function StepAuthorize({
           value: rawUnits,
         });
 
-        // Step 2: Sign
+        
         newStatuses[recipient.id] = "signing";
         setStatuses({ ...newStatuses });
 
@@ -90,7 +90,7 @@ export function StepAuthorize({
           encryptedAmountHandle: encrypted.handle,
         });
 
-        // Success
+        
         newStatuses[recipient.id] = "done";
         setStatuses({ ...newStatuses });
 

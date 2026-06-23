@@ -15,20 +15,17 @@
 /* Import Lenis scroll styling */
 @import "lenis/dist/lenis.css";
 
-/* ── DropShield design tokens (LIGHT) ──────────────────────────────────────
-   Warm off-white canvas, near-black as the primary action, a single gold accent
-   for the "revealed / valuable" moment. Red reserved strictly for destructive.
-   Mono for on-chain data. Token NAMES are kept stable so components don't break. */
-@theme {
-  /* ── Surfaces ── */
-  --color-bg: #e2e2df; /* page canvas */
-  --color-panel: #ffffff; /* surface (cards) */
-  --color-panel-2: #f7f7f4; /* surface-soft */
-  --color-recessed: #d4d3cd; /* surface-recessed (insets, tracks) */
-  --color-edge: #cfcec8; /* border */
-  --color-edge-strong: #b4b2a9; /* border-hover */
 
-  /* ── Primary action = near-black ink ── */
+@theme {
+  
+  --color-bg: #e2e2df; 
+  --color-panel: #ffffff; 
+  --color-panel-2: #f7f7f4; 
+  --color-recessed: #d4d3cd; 
+  --color-edge: #cfcec8; 
+  --color-edge-strong: #b4b2a9; 
+
+  
   --color-iris: #1a1a18;
   --color-iris-dim: #000000;
 
@@ -42,35 +39,32 @@
   --color-gold-tint: #fff1b8;
   --color-gold-dim: #3d2e00;
 
-  /* ── Violet accent (landing hero, Contiant-style) ──
-     Scoped accent for the marketing hero only — the app's primary action stays
-     ink (--color-iris) and its product accent stays gold. Generates utilities
-     bg-violet / text-violet-deep / border-violet-edge / etc. */
-  --color-violet: #7c3aed; /* CTA fill, highlight */
-  --color-violet-hover: #6d28d9; /* CTA hover */
-  --color-violet-deep: #5b21b6; /* violet text on light */
-  --color-violet-tint: #ede9fe; /* soft surface wash */
-  --color-violet-edge: #ddd6fe; /* soft border */
-  --color-violet-line: #c4b5fd; /* dashed connectors */
-  --color-violet-ink: #3a2a6b; /* text on violet surfaces */
+  
+  --color-violet: #7c3aed; 
+  --color-violet-hover: #6d28d9; 
+  --color-violet-deep: #5b21b6; 
+  --color-violet-tint: #ede9fe; 
+  --color-violet-edge: #ddd6fe; 
+  --color-violet-line: #c4b5fd; 
+  --color-violet-ink: #3a2a6b; 
 
-  /* ── Status pairs (bg + text) ── */
+  
   --color-success-bg: #eaf3de;
   --color-success-text: #27500a;
   --color-warning-bg: #faeeda;
   --color-warning-text: #633806;
   --color-danger-bg: #fcebeb;
-  --color-danger: #791f1f; /* danger text (name kept for components) */
+  --color-danger: #791f1f; 
 
-  /* legacy aliases (kept so existing components don't break) */
+  
   --color-accent-cyan: #0891b2;
   --color-success-green: #27500a;
   --color-encrypted: #9a9890;
 
-  /* ── Text ── */
-  --color-ink: #1a1a18; /* text-primary */
-  --color-mute: #6b6a65; /* text-secondary */
-  --color-faint: #9a9890; /* text-tertiary */
+  
+  --color-ink: #1a1a18; 
+  --color-mute: #6b6a65; 
+  --color-faint: #9a9890; 
 
   --font-display: "Eudoxus Sans", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Eudoxus Sans", ui-sans-serif, system-ui, sans-serif;
@@ -99,7 +93,7 @@ body {
   text-rendering: optimizeLegibility;
   background-color: var(--color-bg);
 
-  /* Faint precision dot-grid for subtle blueprint depth (light). */
+  
   background-image: radial-gradient(
     rgba(0, 0, 0, 0.05) 0.9px,
     transparent 0.9px
@@ -108,7 +102,7 @@ body {
   background-position: -1px -1px;
 }
 
-/* Scrollbar customizations */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -124,14 +118,14 @@ body {
   background: var(--color-edge-strong);
 }
 
-/* Visible, styled focus */
+
 *:focus-visible {
   outline: 2px solid var(--color-gold);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* ── Link hover: a violet slanted line that ascends into place ──────────── */
+
 .link-rise {
   position: relative;
 }
@@ -144,7 +138,7 @@ body {
   width: 100%;
   border-radius: 9999px;
   background: var(--color-violet);
-  /* Draws in from the left like a progress bar filling. */
+  
   transform: rotate(-2.5deg) scaleX(0);
   transform-origin: left center;
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
@@ -160,17 +154,14 @@ body {
   }
 }
 
-/* ── Hero floating cards: lift + bring-to-front on hover ──────────────────
-   The wrapper (.hero-card) owns position + GSAP's idle-float transform, so we
-   only touch z-index here — never transform — to avoid fighting GSAP. The
-   lift/scale lives on the inner card element instead. */
+
 .hero-card {
   z-index: 1;
 }
 .hero-card:hover {
   z-index: 40;
 }
-/* Inner card element — the actual visible card. Scale + deepen its shadow. */
+
 .hero-card > * {
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
@@ -189,12 +180,7 @@ body {
   }
 }
 
-/* ── Custom cursor — LANDING PAGE ONLY ──────────────────────────────────────
-   Inline-SVG cursors (no external asset). The two trailing numbers are the
-   hotspot (x y) — the active pixel — which we center on the ring. A keyword
-   fallback (auto / pointer) is mandatory or browsers ignore the whole rule.
-   Scoped under `body.landing-cursor` — the Landing component toggles that class
-   on mount/unmount, so /admin and /claim keep the normal system cursor. */
+
 body.landing-cursor {
   cursor:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='6' fill='none' stroke='%237c3aed' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='1.5' fill='%237c3aed'/%3E%3C/svg%3E")
@@ -209,7 +195,7 @@ body.landing-cursor
     pointer;
 }
 
-/* ── Motion & Custom Gradients ─────────────────────────────────────────── */
+
 
 .mesh-gradient-bg {
   background: var(--color-bg);
@@ -295,9 +281,7 @@ html.lenis {
   pointer-events: none;
 }
 
-/* ── Oversized footer wordmark (Bankyz-style) ──────────────────────────────
-   A very large, low-contrast "enveil" anchoring the page bottom. clamp() scales
-   it from phone to wide desktop without breaking the layout. */
+
 .footer-wordmark {
   font-family: var(--font-wordmark);
   font-size: clamp(4rem, 18vw, 16rem);
@@ -310,7 +294,7 @@ html.lenis {
   pointer-events: none;
 }
 
-/* ── FEATURES SECTION ──────────────────────────────────────────────────── */
+
 .features-section {
   padding-top: 5rem;
   padding-bottom: 4rem;
@@ -324,15 +308,14 @@ html.lenis {
   z-index: 1;
 }
 
-/* Inner column: bounds the full-bleed section back to content width and stacks
-   header → bento grid → CTA. */
+
 .features-inner {
   width: 100%;
-  max-width: 72rem; /* 1152px */
+  max-width: 72rem; 
   padding-inline: 1.5rem;
 }
 
-/* ── Heading ── */
+
 .features-heading {
   text-align: center;
   max-width: 36rem;
@@ -381,7 +364,7 @@ html.lenis {
   margin-inline: auto;
 }
 
-/* ── Cards: BENTO grid ── */
+
 .features-grid {
   display: grid;
   gap: 1.25rem;
@@ -411,7 +394,7 @@ html.lenis {
   }
 }
 
-/* ── Individual card ── */
+
 .feature-card {
   position: relative;
   display: flex;
@@ -438,7 +421,7 @@ html.lenis {
     0 28px 70px -20px rgba(40, 24, 80, 0.26);
 }
 
-/* Soft radial sheen in the card's accent color, anchored top-right. */
+
 .feature-card::before {
   content: "";
   position: absolute;
@@ -453,7 +436,7 @@ html.lenis {
   opacity: 0.55;
 }
 
-/* Number badge */
+
 .feature-card-number {
   position: absolute;
   top: 1.5rem;
@@ -466,7 +449,7 @@ html.lenis {
   opacity: 0.75;
 }
 
-/* Content area */
+
 .feature-card-content {
   padding: 0;
 }
@@ -515,7 +498,7 @@ html.lenis {
   color: color-mix(in srgb, var(--card-accent) 78%, var(--color-ink));
 }
 
-/* Image container wrappers */
+
 .feature-card-image-wrap {
   position: relative;
   border-radius: 1rem;
@@ -582,7 +565,7 @@ html.lenis {
   text-align: center;
 }
 
-/* Wide layout flex row inner */
+
 .feature-card-payroll-inner {
   display: flex;
   flex-direction: column;
@@ -603,7 +586,7 @@ html.lenis {
   }
 }
 
-/* Vesting Cipher row */
+
 .feature-card-cipher {
   margin-top: 1.5rem;
   padding-top: 1.25rem;
@@ -633,7 +616,7 @@ html.lenis {
   padding: 0.28rem 0.55rem;
 }
 
-/* Small Try-it CTA Card */
+
 .feature-card--trust {
   display: flex;
   flex-direction: column;
@@ -708,7 +691,7 @@ html.lenis {
   background: rgba(255, 255, 255, 0.85);
 }
 
-/* ── Closing CTA band ── */
+
 .features-cta {
   margin-top: 1.5rem;
   display: flex;
@@ -751,7 +734,7 @@ html.lenis {
   }
 }
 
-/* ── Responsive fine-tuning ── */
+
 @media (max-width: 767px) {
   .features-section {
     padding-top: 3.5rem;

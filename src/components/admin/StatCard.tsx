@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-/** Dashboard summary stat — label, big value, optional hint. */
+
 export function StatCard({
   label,
   value,

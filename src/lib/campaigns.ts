@@ -1,34 +1,37 @@
 import type { CampaignType } from "@/lib/recipients";
 
-/**
- * Local metadata for campaigns the admin created. The authoritative campaign
- * list, status, and claim counts come from on-chain logs (see
- * useCampaignAnalytics) — but a campaign's human NAME, its total-recipients
- * DENOMINATOR, and its TYPE are off-chain (amounts/recipients are confidential),
- * so we cache them here, keyed by lowercased campaign address.
- *
- * All access is best-effort: localStorage can be unavailable (private mode,
- * quota, SSR). Every function swallows errors and returns a safe default — the
- * dashboard still renders from on-chain data alone if this layer is empty.
- */
+
 
 const STORE_KEY = "enveil.campaigns.v1";
 
 export interface StoredCampaign {
-  /** Lowercased clone address — primary key. */
+  
   address: string;
-  /** User-entered campaign name ("" if skipped). */
+  
   name: string;
   campaignType: CampaignType;
   tokenAddress: string;
-  /** Denominator for claim-progress %. */
+  
   totalRecipients: number;
   startTimestamp: number;
   endTimestamp: number;
-  /** Date.now() ms — sort fallback / mid-flow detection. */
+  
   createdAt: number;
-  /** Lowercased admin address — scopes reads per wallet. */
+  
   admin: string;
+  
+  trancheAddresses?: string[];
+  
+  trancheCount?: number;
+}
+
+
+export function getHiddenTrancheAddresses(admin: string): Set<string> {
+  const hidden = new Set<string>();
+  for (const c of getStoredCampaigns(admin)) {
+    for (const t of c.trancheAddresses ?? []) hidden.add(t.toLowerCase());
+  }
+  return hidden;
 }
 
 type CampaignStore = Record<string, StoredCampaign>;
@@ -48,11 +51,11 @@ function writeStore(store: CampaignStore): void {
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(store));
   } catch {
-    /* private mode / quota — ignore */
+    
   }
 }
 
-/** Insert or merge a campaign (by address). Lowercases address + admin. */
+
 export function saveCampaign(c: StoredCampaign): void {
   const key = c.address.toLowerCase();
   const store = readStore();
@@ -64,7 +67,7 @@ export function getStoredCampaign(address: string): StoredCampaign | undefined {
   return readStore()[address.toLowerCase()];
 }
 
-/** All stored campaigns for a given admin, newest first. */
+
 export function getStoredCampaigns(admin: string): StoredCampaign[] {
   const a = admin.toLowerCase();
   return Object.values(readStore())

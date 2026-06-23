@@ -53,17 +53,17 @@ export function StepFund({
 
   const factoryAddress = getFheAirdropFactoryAddress(chainId) || "0xbE6A3B78B36684fFee48De77d47Bc3393F5Acd4c";
 
-  // Admin ETH balance — create+fund is gas-heavy (~0.045 ETH measured). Warn low.
+  
   const { data: ethBalance } = useBalance({ address: adminAddress });
-  const LOW_ETH_THRESHOLD = 50_000_000_000_000_000n; // 0.05 ETH in wei
+  const LOW_ETH_THRESHOLD = 50_000_000_000_000_000n; 
   const isLowEth = ethBalance !== undefined && ethBalance.value < LOW_ETH_THRESHOLD;
 
-  // Gas fee resolution
+  
   const { data: defaultFee } = useFactoryDefaultGasFee();
   const { data: customFee } = useFactoryCustomFee({ creator: adminAddress });
   const gasFee = customFee?.enabled ? customFee.gasFee : (defaultFee ?? 0n);
 
-  // Operator approval
+  
   const { writeContractAsync: approveOperator, isPending: isApprovePending } = useWriteContract();
   const {
     isLoading: isApproveConfirming,
@@ -71,13 +71,13 @@ export function StepFund({
     isError: isApproveReceiptError,
   } = useWaitForTransactionReceipt({ hash: approveTxHash });
 
-  // useWaitForTransactionReceipt resolves successfully even when the tx REVERTED
-  // (status: "reverted") — so gate "done" on the receipt status, not just on the
-  // query succeeding. A reverted approval must NOT unlock the deposit step.
+  
+  
+  
   const approveReverted = approveReceipt?.status === "reverted";
 
-  // Surface a reverted / failed approval and let the user re-approve (clearing the
-  // hash brings the Approve button back).
+  
+  
   useEffect(() => {
     if (approveReverted || isApproveReceiptError) {
       setErrorMsg(
@@ -87,7 +87,7 @@ export function StepFund({
     }
   }, [approveReverted, isApproveReceiptError]);
 
-  // Funding mutation
+  
   const fundMutation = useFundConfidentialAirdrop({
     encryptor: () => zamaSDK.relayer,
   });
@@ -95,7 +95,7 @@ export function StepFund({
   const handleApprove = async () => {
     setErrorMsg("");
     try {
-      const until = 2_000_000_000; // ~year 2033
+      const until = 2_000_000_000; 
       const hash = await approveOperator({
         address: tokenAddress as `0x${string}`,
         abi: erc7984SetOperatorAbi,
@@ -110,8 +110,8 @@ export function StepFund({
   };
 
   // The Zama public testnet relayer intermittently times out / fetch-fails on the
-  // ENCRYPT step (30s timeout is hardcoded in the SDK worker). Encryption throws
-  // BEFORE any on-chain submit, so retrying is safe and idempotent.
+  
+  
   const isTransientRelayerError = (msg: string) =>
     /timed out|fetch failed|Fetch POST failed|ENCRYPT|NODE_INIT|worker pool|initialize FHE|network|ECONNRESET|ETIMEDOUT/i.test(
       msg,
@@ -171,7 +171,7 @@ export function StepFund({
     }
   };
 
-  // Only a confirmed-successful receipt counts as done.
+  
   const isApproveDone = approveReceipt?.status === "success";
 
   return (
@@ -215,10 +215,9 @@ export function StepFund({
         </div>
       )}
 
-      {/* Two-part funding sequence. Marker is a small circle (distinct from the
-          page Stepper) so it reads as a sub-task, not a competing stepper. */}
+      {}
       <div className="space-y-3">
-        {/* Approve */}
+        {}
         <div
           className={
             "rounded-xl border p-5 transition-all duration-150 " +
@@ -266,7 +265,7 @@ export function StepFund({
           </div>
         </div>
 
-        {/* Deposit */}
+        {}
         <div
           className={
             "rounded-xl border p-5 transition-all duration-150 " +

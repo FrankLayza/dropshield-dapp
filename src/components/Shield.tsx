@@ -1,8 +1,4 @@
-/**
- * Brand mark — a shield with a gold keyhole (privacy/lock). Replaces the blue
- * 🛡️ emoji, which renders off-brand on most platforms. Inherits currentColor
- * for the shield body so it adapts to context.
- */
+
 export function Shield({ size = 20 }: { size?: number }) {
   return (
     <svg

@@ -1,9 +1,4 @@
-/**
- * Stepper — the signature element. A connected pipeline of 5 campaign steps.
- * The connector between nodes FILLS as you advance; completed steps lock with a
- * check; the active step carries a soft gold ring. This encodes the forward-only,
- * irreversible nature of on-chain campaign creation — you can't un-deploy.
- */
+
 export interface StepDef {
   id: number;
   label: string;
@@ -14,7 +9,7 @@ export function Stepper({
   current,
 }: {
   steps: StepDef[];
-  current: number; // 1-based index of the active step
+  current: number; 
 }) {
   return (
     <ol className="flex items-start">
@@ -31,8 +26,8 @@ export function Stepper({
               <span
                 className={
                   "mt-2.5 whitespace-nowrap text-[11px] font-medium tracking-wide transition-colors duration-200 sm:text-xs " +
-                  // On mobile, hide labels to prevent squeezing under the nodes.
-                  // The active step title shows in the page header on mobile instead.
+                  
+                  
                   "hidden sm:block " +
                   (status === "active"
                     ? "text-ink font-semibold"

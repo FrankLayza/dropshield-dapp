@@ -13,7 +13,7 @@ interface StepDeliverProps {
     signature: string;
   }>;
   campaignType: CampaignType;
-  /** Present for vesting campaigns — each recipient has multiple dated tranches. */
+  
   vestingDeliveries?: VestingRecipientDelivery[];
   onReset: () => void;
 }
@@ -31,9 +31,9 @@ export function StepDeliver({
   const noun = recipientNoun(campaignType);
   const isVesting = !!vestingDeliveries && vestingDeliveries.length > 0;
 
-  // Vesting: one link per recipient carrying ALL their dated tranches. Encoded as
-  // a compact JSON payload in the URL fragment under `v=`. The claim page detects
-  // `v` and renders a vesting timeline.
+  
+  
+  
   const getVestingClaimLink = (d: VestingRecipientDelivery) => {
     const payload = {
       r: d.address,
@@ -55,8 +55,8 @@ export function StepDeliver({
   const getClaimLink = (auth: (typeof authorizations)[0]) => {
     const origin = window.location.origin;
     const path = "/claim";
-    // Label is free text → URL-encode it. URLSearchParams on the claim page
-    // auto-decodes. The hex/numeric fields are already URL-safe.
+    
+    
     const labelPart = auth.label ? `&l=${encodeURIComponent(auth.label)}` : "";
     const hash = `c=${campaignAddress}&r=${auth.address}&a=${auth.amount}&h=${auth.encryptedInput.handle}&p=${auth.encryptedInput.inputProof}&s=${auth.signature}${labelPart}`;
     return `${origin}${path}#${hash}`;
@@ -69,7 +69,7 @@ export function StepDeliver({
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  // Bulk export for pasting into email / Notion / a spreadsheet.
+  
   const csvEscape = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
   const handleCopyAllCsv = () => {
     const header = "label,address,amount,claimLink";

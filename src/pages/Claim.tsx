@@ -13,25 +13,25 @@ import { ConfidentialBalance } from "@/components/ConfidentialBalance";
 import { VestingClaim, type VestingPayload } from "@/components/VestingClaim";
 
 // The Zama relayer and Sepolia RPC intermittently time out / fetch-fail. These
-// are transient and deserve a calm "try again" rather than a raw stack trace.
-// Used for both the reveal (getClaimAmount) and decrypt (userDecrypt) steps.
+
+
 const isTransientRelayerError = (msg: string) =>
   /timed out|fetch|relayer|network|ENCRYPT|worker|NODE_INIT|ECONNRESET|ETIMEDOUT/i.test(
     msg,
   );
 
-const LOW_ETH_THRESHOLD = 5_000_000_000_000_000n; // 0.005 ETH in wei
+const LOW_ETH_THRESHOLD = 5_000_000_000_000_000n; 
 
 export function Claim() {
   const { address: connectedAddress, isConnected } = useAccount();
 
-  // Recipient gas balance — claiming is an on-chain tx (plus an auto-attached
+  
   // gas fee), so a recipient with no Sepolia ETH would hit a confusing revert.
   const { data: ethBalance } = useBalance({ address: connectedAddress });
   const isLowEth =
     isConnected && ethBalance !== undefined && ethBalance.value < LOW_ETH_THRESHOLD;
 
-  // Payload inputs
+  
   const [campaignAddress, setCampaignAddress] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
   const [plaintextAmount, setPlaintextAmount] = useState("");
@@ -40,7 +40,7 @@ export function Claim() {
   const [signature, setSignature] = useState<`0x${string}` | "">("");
   const [recipientLabel, setRecipientLabel] = useState("");
 
-  // Process / verify states
+  
   const [revealHandle, setRevealHandle] = useState<`0x${string}` | "">("");
   const [decryptedAmount, setDecryptedAmount] = useState<bigint | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
@@ -50,16 +50,16 @@ export function Claim() {
   const [showManualImport, setShowManualImport] = useState(false);
   const [pastedJson, setPastedJson] = useState("");
 
-  // Vesting payload (multi-tranche) — when present we render the vesting timeline
-  // instead of the single-claim flow.
+  
+  
   const [vestingPayload, setVestingPayload] = useState<VestingPayload | null>(null);
 
-  // 1) Parse parameters from URL hash if present
+  
   useEffect(() => {
     const hash = window.location.hash.substring(1);
     if (!hash) return;
     try {
-      // Vesting links carry a JSON payload under `v=`.
+      
       const vMatch = hash.match(/(?:^|&)v=([^&]+)/);
       if (vMatch) {
         const parsed = JSON.parse(decodeURIComponent(vMatch[1]));
@@ -77,7 +77,7 @@ export function Claim() {
       const h = params.get("h");
       const p = params.get("p");
       const s = params.get("s");
-      const l = params.get("l"); // optional display label
+      const l = params.get("l"); 
 
       if (c && r && a && h && p && s) {
         setCampaignAddress(c);
@@ -87,14 +87,14 @@ export function Claim() {
         setInputProof(p as `0x${string}`);
         setSignature(s as `0x${string}`);
         if (l) setRecipientLabel(l);
-        window.location.hash = ""; // Clear hash to keep URL clean
+        window.location.hash = ""; 
       }
     } catch (err) {
       console.error("Failed to parse URL hash parameters", err);
     }
   }, []);
 
-  // Helper to load parsed JSON
+  
   const loadPayload = useCallback(
     (data: any) => {
       setErrorMsg("");
@@ -103,7 +103,7 @@ export function Claim() {
       setRevealHandle("");
 
       try {
-        // Vesting export: { type:"vesting", deliveries:[{address,label,totalAmount,tranches}] }
+        
         if (data?.type === "vesting" && Array.isArray(data.deliveries)) {
           const mine =
             (connectedAddress &&
@@ -134,13 +134,13 @@ export function Claim() {
         let auth = null;
 
         if (Array.isArray(data.authorizations)) {
-          // If multiple, try to find one for the connected account
+          
           if (connectedAddress) {
             auth = data.authorizations.find(
               (x: any) => x.recipient?.toLowerCase() === connectedAddress.toLowerCase()
             );
           }
-          // Default to first if none matched
+          
           if (!auth) auth = data.authorizations[0];
         } else if (data.recipient && data.signature) {
           auth = data;
@@ -165,7 +165,7 @@ export function Claim() {
     [connectedAddress]
   );
 
-  // Drag and drop handler
+  
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
@@ -196,7 +196,7 @@ export function Claim() {
     }
   };
 
-  // Queries for status checking
+  
   const isLoaded = !!campaignAddress && !!encryptedHandle && !!signature;
 
   const isClaimedQuery = useAirdropIsSignatureClaimed({
@@ -205,7 +205,7 @@ export function Claim() {
     encryptedAmountHandle: encryptedHandle || undefined,
   });
 
-  // Mutations
+  
   const revealMutation = useGetClaimAmount({
     address: campaignAddress as `0x${string}`,
   });
@@ -215,8 +215,8 @@ export function Claim() {
   });
 
   // Decrypt the granted handle via the Zama relayer. The relayer intermittently
-  // times out — react-query auto-retries (transient by nature) with backoff so a
-  // single slow response doesn't hard-fail the reveal.
+  
+  
   const decryptQuery = useUserDecrypt(
     {
       handles: revealHandle
@@ -236,7 +236,7 @@ export function Claim() {
     if (typeof value === "bigint") setDecryptedAmount(value);
   }, [decryptQuery.data, revealHandle]);
 
-  // After react-query exhausts retries, surface a clear (relayer-aware) error.
+  
   useEffect(() => {
     if (!decryptQuery.error) return;
     const msg = decryptQuery.error.message || "";
@@ -247,7 +247,7 @@ export function Claim() {
     );
   }, [decryptQuery.error]);
 
-  // Surface a calm "relayer slow, retrying" notice while react-query retries.
+  
   const isDecryptRetrying =
     !!revealHandle && decryptedAmount === null && decryptQuery.failureCount > 0 && decryptQuery.isFetching;
 
@@ -318,9 +318,7 @@ export function Claim() {
         <VestingClaim payload={vestingPayload} onClear={() => setVestingPayload(null)} />
       ) : !isLoaded ? (
         <div className="space-y-4">
-          {/* Link-first empty state. Recipients arrive via a private claim link
-              whose URL fragment auto-populates the claim — no upload needed. The
-              JSON import is a fallback, hidden behind a toggle. */}
+          {}
           <div className="rounded-xl border border-edge bg-panel p-6 text-center space-y-3">
             <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-gold/10 text-gold-dim">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -355,7 +353,7 @@ export function Claim() {
                   Hide
                 </button>
               </div>
-          {/* Dropzone */}
+          {}
           <label
             onDragOver={(e) => {
               e.preventDefault();
@@ -445,7 +443,7 @@ export function Claim() {
         </div>
       ) : (
         <div className="space-y-6 animate-step-in">
-          {/* Loaded details */}
+          {}
           <div className="rounded-xl border border-edge bg-panel p-4 sm:p-5 space-y-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
               <span className="text-sm font-semibold text-ink">
@@ -499,7 +497,7 @@ export function Claim() {
               </div>
             </div>
 
-            {/* Verification status */}
+            {}
             {decryptedAmount !== null && (
               <div className="flex items-center gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800 text-sm">
                 <span className="text-lg">🛡️</span>
@@ -514,7 +512,7 @@ export function Claim() {
             )}
           </div>
 
-          {/* Verification & Claim actions */}
+          {}
           <div className="rounded-2xl border border-edge bg-panel p-4 sm:p-6 space-y-5">
             {!isConnected ? (
               <div className="text-center py-6 text-sm text-mute">
@@ -557,7 +555,7 @@ export function Claim() {
                   </div>
                 )}
 
-                {/* Reveal & Decrypt */}
+                {}
                 {decryptedAmount === null && (
                   <div className="space-y-2.5">
                     <h3 className="text-sm font-semibold text-ink">
@@ -580,8 +578,7 @@ export function Claim() {
                   </div>
                 )}
 
-                {/* Claim — gated on verification. The recipient must decrypt and
-                    confirm their on-chain allocation before the claim is unlocked. */}
+                {}
                 <div className="space-y-2.5 pt-3 border-t border-edge">
                   <h3 className="text-sm font-semibold text-ink">
                     2. Claim Tokens
@@ -621,9 +618,7 @@ export function Claim() {
         </div>
       )}
 
-      {/* Balance is decoupled from the claim flow — a recipient can check their
-          confidential balance any time their wallet is connected, with no payload.
-          A confidential balance can't show in any wallet; you decrypt it here. */}
+      {}
       {isConnected && (
         <div className="border-t border-edge pt-6">
           <ConfidentialBalance />
@@ -633,11 +628,10 @@ export function Claim() {
   );
 }
 
-/**
+/* *
  * AmountReveal — animates a confidential allocation from 0 up to its decrypted
  * value, turning the FHE decrypt into the visible "reveal" moment. Honors the
- * user's reduced-motion preference by snapping straight to the final value.
- */
+ * user's reduced-motion preference by snapping straight to the final value. */
 function AmountReveal({ raw }: { raw: bigint }) {
   const reduceMotion = useReducedMotion();
   const target = Number(raw) / 10 ** TOKEN_DECIMALS;
@@ -657,7 +651,7 @@ function AmountReveal({ raw }: { raw: bigint }) {
     return () => controls.stop();
   }, [mv, target, reduceMotion]);
 
-  // Snap to the exact decrypted value (avoids float drift on the final frame).
+  
   const isSettled = Math.abs(display - target) < 0.5;
   const text = isSettled
     ? formatTokens(raw)

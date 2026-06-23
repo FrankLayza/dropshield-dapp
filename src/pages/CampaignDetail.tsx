@@ -56,7 +56,7 @@ export function CampaignDetail() {
   }
 
   // Network/RPC failure — distinct from "not found" so the admin doesn't think
-  // their campaign vanished when it's really a rate-limited public node.
+  
   if (isError) {
     return (
       <div className="mx-auto max-w-2xl">

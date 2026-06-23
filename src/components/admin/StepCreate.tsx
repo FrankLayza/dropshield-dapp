@@ -35,7 +35,7 @@ export function StepCreate({
   const { address: adminAddress, isConnected } = useAccount();
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Convert Unix timestamps to datetime-local strings
+  
   const toDateTimeString = (ts: number) => {
     const d = new Date(ts * 1000);
     const pad = (n: number) => String(n).padStart(2, "0");
@@ -45,7 +45,7 @@ export function StepCreate({
   const [startStr, setStartStr] = useState(() => toDateTimeString(startTimestamp));
   const [endStr, setEndStr] = useState(() => toDateTimeString(endTimestamp));
 
-  // Sync back to parent when string dates change
+  
   useEffect(() => {
     try {
       const sTs = Math.floor(new Date(startStr).getTime() / 1000);
@@ -126,7 +126,7 @@ export function StepCreate({
       </div>
 
       <div className="space-y-4">
-        {/* Token Address */}
+        {}
         <div>
           <label className="block text-xs font-medium uppercase tracking-wider text-faint mb-1.5">
             Confidential Token (ERC-7984) Address
@@ -151,7 +151,7 @@ export function StepCreate({
           </div>
         </div>
 
-        {/* Start / End dates */}
+        {}
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="block text-xs font-medium uppercase tracking-wider text-faint mb-1.5">
@@ -177,7 +177,7 @@ export function StepCreate({
           </div>
         </div>
 
-        {/* Can Extend Claim Window */}
+        {}
         <label className="flex items-center gap-2.5 cursor-pointer py-1">
           <input
             type="checkbox"
@@ -192,7 +192,7 @@ export function StepCreate({
           </div>
         </label>
 
-        {/* Salt */}
+        {}
         <div>
           <label className="block text-xs font-medium uppercase tracking-wider text-faint mb-1.5">
             Salt (for CREATE2 address predictability)

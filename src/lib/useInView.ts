@@ -1,9 +1,6 @@
 import { useEffect, useRef } from "react";
 
-/**
- * Adds `.in-view` to the element when it scrolls into view, triggering the
- * `.stagger` fade-up animation. One-shot (unobserves after firing).
- */
+
 export function useInView<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   useEffect(() => {

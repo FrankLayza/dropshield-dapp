@@ -43,7 +43,7 @@ export function App() {
   );
 }
 
-/* ── Brand wordmark (shared by both navs) ─────────────────────────────────── */
+
 function Wordmark({ light }: { light?: boolean }) {
   return (
     <Link
@@ -97,7 +97,7 @@ function MarketingNav() {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-30 pointer-events-none flex justify-center">
-      {/* ── UNIFIED NAVBAR ── */}
+      {}
       <div
         className="flex items-center justify-between"
         style={{
@@ -121,12 +121,12 @@ function MarketingNav() {
           pointerEvents: "auto",
         }}
       >
-        {/* Wordmark */}
+        {}
         <div style={{ flexShrink: 0 }}>
           <Wordmark light={!scrolled} />
         </div>
 
-        {/* Center anchor links (desktop) */}
+        {}
         <nav
           className="hidden md:flex items-center justify-center overflow-hidden"
           style={{
@@ -156,7 +156,7 @@ function MarketingNav() {
           ))}
         </nav>
 
-        {/* Right action & mobile triggers */}
+        {}
         <div className="flex items-center gap-2" style={{ flexShrink: 0 }}>
           <Link
             to="/admin"
@@ -191,7 +191,7 @@ function MarketingNav() {
             </svg>
           </Link>
 
-          {/* Mobile hamburger menu */}
+          {}
           <div
             className="flex items-center md:hidden"
             style={{
@@ -235,7 +235,7 @@ function MarketingNav() {
         </div>
       </div>
 
-      {/* Mobile dropdown panel */}
+      {}
       {!scrolled && menuOpen && (
         <div
           className="border-t border-edge/60 bg-bg/95 backdrop-blur-md md:hidden animate-step-in"
@@ -265,9 +265,7 @@ function MarketingNav() {
   );
 }
 
-/* ── App nav (create / claim / dashboard) ──────────────────────────────────
-   Minimal app shell: wordmark left, wallet right. Always opaque, no marketing
-   links — the chrome stays out of the way of the product. */
+
 function AppNav({ pathname }: { pathname: string }) {
   return (
     <header className="sticky top-0 z-30 border-b border-edge/60 bg-bg/80 backdrop-blur-md">
@@ -288,8 +286,7 @@ function AppNav({ pathname }: { pathname: string }) {
   );
 }
 
-/** App-nav text link — slant-underline hover; active route keeps it drawn
-    (see `.link-rise[aria-current]` in index.css). */
+
 function NavLink({
   to,
   active,

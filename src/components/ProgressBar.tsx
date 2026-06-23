@@ -1,7 +1,4 @@
-/**
- * Violet claim-progress bar. `indeterminate` mode (no known denominator) shows a
- * neutral pulsing segment instead of a misleading 0%.
- */
+
 export function ProgressBar({
   value,
   max,

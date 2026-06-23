@@ -18,7 +18,7 @@ export function DashboardMetrics({
 
   return (
     <>
-      {/* Mobile Grid View (md:hidden) */}
+      {}
       <Reveal.Stagger className="grid grid-cols-2 gap-4 md:hidden">
         <Reveal.Item>
           <StatCard label="Campaigns" value={campaignsCount} />
@@ -34,10 +34,10 @@ export function DashboardMetrics({
         </Reveal.Item>
       </Reveal.Stagger>
 
-      {/* Desktop Unified Card Bar (hidden md:flex) */}
+      {}
       <Reveal className="hidden md:block">
         <div className="flex w-full items-center justify-between rounded-2xl border border-edge bg-panel py-6 shadow-sm divide-x divide-edge/60">
-          {/* Campaigns */}
+          {}
           <div className="flex-1 px-6 flex items-center gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-edge bg-panel-2 text-mute">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -51,7 +51,7 @@ export function DashboardMetrics({
             </div>
           </div>
 
-          {/* Active */}
+          {}
           <div className="flex-1 px-6 flex items-center gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-edge bg-panel-2 text-mute">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -64,7 +64,7 @@ export function DashboardMetrics({
             </div>
           </div>
 
-          {/* Total Claims */}
+          {}
           <div className="flex-1 px-6 flex items-center gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-edge bg-panel-2 text-mute">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -78,7 +78,7 @@ export function DashboardMetrics({
             </div>
           </div>
 
-          {/* Avg Claim Rate */}
+          {}
           <div className="flex-1 px-6 flex items-center gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-edge bg-panel-2 text-mute">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

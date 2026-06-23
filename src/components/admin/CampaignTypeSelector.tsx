@@ -1,11 +1,7 @@
 import type { ReactNode } from "react";
 import type { CampaignType } from "@/lib/recipients";
 
-/**
- * CampaignTypeSelector — display-only campaign framing. Picking a type changes
- * copy/labels throughout the wizard (e.g. "contributor" vs "investor"); it does
- * NOT change any contract call. Same create → fund → authorize → claim pipeline.
- */
+
 const OPTIONS: Array<{
   id: CampaignType;
   label: string;
@@ -69,7 +65,7 @@ export function CampaignTypeSelector({
                   : "border-edge-strong hover:-translate-y-0.5 hover:border-(--card-accent)/50 hover:bg-panel-2")
               }
             >
-              {/* Selected check */}
+              {}
               {selected && (
                 <span
                   className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full"
@@ -99,7 +95,7 @@ export function CampaignTypeSelector({
   );
 }
 
-/* ── Icons (Lucide-style, 24×24) ─────────────────────────────────────────── */
+
 function BriefcaseIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">

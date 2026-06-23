@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { Reveal } from "@/components/Reveal";
 
-/* ── How It Works ───────────────────────────────────────────────────────────
-   Numbered-circle connector design (matching the Bankyz-style screenshot):
-   · Eyebrow label + large display headline
-   · Three numbered circles joined by a horizontal line on desktop
-   · Title + body copy beneath each circle
-   · Rounded photo/illustration card beneath each column
-   Horizontal on desktop, vertical stack on mobile.                          */
+
 
 const STEPS = [
   {
@@ -41,7 +35,7 @@ export function HowItWorks() {
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
 
-        {/* ── Header ─────────────────────────────────────────────────────── */}
+        {}
         <Reveal className="mx-auto max-w-2xl text-center mb-16 sm:mb-20">
           <span
             style={{
@@ -72,15 +66,15 @@ export function HowItWorks() {
           </h2>
         </Reveal>
 
-        {/* ── Steps ──────────────────────────────────────────────────────── */}
+        {}
         <Reveal.Stagger className="relative grid gap-12 md:grid-cols-3 md:gap-8">
 
-          {/* Horizontal connector line (desktop only) */}
+          {}
           <div
             aria-hidden
             style={{
               position: "absolute",
-              top: "1.5rem",        /* aligns with circle center */
+              top: "1.5rem",        
               left: "calc(16.667% + 1.5rem)",
               right: "calc(16.667% + 1.5rem)",
               height: "1px",
@@ -98,7 +92,7 @@ export function HowItWorks() {
         </Reveal.Stagger>
       </div>
 
-      {/* ── Rail desktop reveal via CSS ─────────────────────────────────── */}
+      {}
       <style>{`
         @media (min-width: 768px) {
           .hiw-rail { display: block !important; }
@@ -108,13 +102,13 @@ export function HowItWorks() {
   );
 }
 
-/* ── Individual step column ─────────────────────────────────────────────── */
+
 function StepColumn({ step }: { step: (typeof STEPS)[number] }) {
   const [imgOk, setImgOk] = useState(true);
 
   return (
     <>
-      {/* Numbered circle */}
+      {}
       <div
         style={{
           position: "relative",
@@ -144,7 +138,7 @@ function StepColumn({ step }: { step: (typeof STEPS)[number] }) {
         </span>
       </div>
 
-      {/* Title */}
+      {}
       <h3
         style={{
           fontFamily: "var(--font-display)",
@@ -159,7 +153,7 @@ function StepColumn({ step }: { step: (typeof STEPS)[number] }) {
         {step.title}
       </h3>
 
-      {/* Body */}
+      {}
       <p
         style={{
           fontSize: "0.9rem",
@@ -173,7 +167,7 @@ function StepColumn({ step }: { step: (typeof STEPS)[number] }) {
         {step.body}
       </p>
 
-      {/* Photo card */}
+      {}
       <div
         style={{
           marginTop: "auto",
@@ -201,7 +195,7 @@ function StepColumn({ step }: { step: (typeof STEPS)[number] }) {
             }}
           />
         ) : (
-          /* Graceful fallback — styled placeholder */
+          
           <div
             style={{
               width: "100%",

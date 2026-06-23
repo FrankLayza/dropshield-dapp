@@ -7,10 +7,10 @@ import { useLenis } from "lenis/react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-// Mirrors the three campaign types in the create wizard (payroll / investor /
-// community). No "vesting" — the confidential airdrop is a single private claim,
-// not a vesting schedule. The selling point is the same across all three: amounts
-// are otherwise public on every block explorer; Enveil encrypts them on-chain.
+
+
+
+
 const USE_CASES = [
   {
     title: "Contributor Payroll",
@@ -65,7 +65,7 @@ export function Features() {
           const { reduceMotion, isDesktop } = context.conditions!;
           if (reduceMotion) return;
 
-          /* Header: eyebrow → title → subtitle rise in on enter. */
+          
           gsap.from(".js-features-header > *", {
             scrollTrigger: { trigger: ".js-features-header", start: "top 85%" },
             y: 24,
@@ -75,7 +75,7 @@ export function Features() {
             ease: "power3.out",
           });
 
-          /* Bento cards stagger up as the grid enters. */
+          
           gsap.from(".js-feature-card", {
             scrollTrigger: { trigger: ".features-grid", start: "top 80%" },
             y: 56,
@@ -85,7 +85,7 @@ export function Features() {
             ease: "power3.out",
           });
 
-          /* Scroll-driven parallax on each illustration (desktop only). */
+          
           if (isDesktop) {
             gsap.utils.toArray<HTMLElement>(".js-feature-illustration").forEach((el, i) => {
               gsap.to(el, {
@@ -113,7 +113,7 @@ export function Features() {
   return (
     <section ref={sectionRef} className="features-section" id="use-cases">
       <div className="features-inner">
-        {/* ── Heading ── */}
+        {}
         <div className="features-heading js-features-header">
           <span className="features-label">Use cases</span>
           <h2 className="features-title">

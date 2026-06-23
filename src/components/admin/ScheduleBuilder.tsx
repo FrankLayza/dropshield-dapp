@@ -29,12 +29,7 @@ const CLIFF_PRESETS = [
   { label: "6 mo", days: 180 },
 ];
 
-/**
- * ScheduleBuilder — vesting-only Step 1 sub-panel. Lets the admin shape the
- * unlock schedule (slice count, interval, cliff) and shows a live preview of
- * the dated tranches, per-tranche pool totals, and the on-chain cost (one deploy
- * per tranche).
- */
+
 export function ScheduleBuilder({
   schedule,
   onChange,

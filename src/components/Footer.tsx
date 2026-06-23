@@ -1,16 +1,13 @@
 import { Link } from "react-router-dom";
 
-/**
- * Minimalist Sitemap Footer
- * Displays brand info on the left, primary operation links + testnet status on the right.
- */
+
 export function Footer() {
   return (
     <footer className="mt-32 border-t border-edge/60 bg-panel-2/30 backdrop-blur-xs py-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-edge/20">
           
-          {/* Left side: Brand info */}
+          {}
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-1.5">
               <img src="/illustrations/enveil-logo-2.svg" alt="Enveil Logo" className="h-5 w-auto" />
@@ -46,14 +43,14 @@ export function Footer() {
 
         </div>
 
-        {/* Bottom Bar */}
+        {}
         <div className="pt-6 text-xs text-faint">
           © {new Date().getFullYear()} Enveil Protocol. Built under Zama Developer Program.
         </div>
 
       </div>
 
-      {/* Oversized wordmark — anchors the page bottom (Bankyz-style). */}
+      {}
       <div className="mt-10 overflow-hidden px-4 sm:px-6">
         <div className="mx-auto max-w-6xl">
           <span className="footer-wordmark block">enveil</span>
