@@ -92,12 +92,12 @@ function MarketingNav() {
 
   const goTo = (id: string) => {
     setMenuOpen(false);
-    lenis?.scrollTo(`#${id}`, { offset: -72 });
+    const offset = id === "how-it-works" ? 0 : -72;
+    lenis?.scrollTo(`#${id}`, { offset });
   };
 
   return (
     <header className="fixed left-0 right-0 top-0 z-30 pointer-events-none flex justify-center">
-      {}
       <div
         className="flex items-center justify-between"
         style={{
@@ -105,32 +105,24 @@ function MarketingNav() {
           width: scrolled ? "300px" : "100%",
           maxWidth: scrolled ? "300px" : "72rem",
           borderRadius: scrolled ? "9999px" : "0px",
-          padding: scrolled
-            ? "0.45rem 0.5rem 0.45rem 1.25rem"
-            : "1.25rem 1.5rem",
+          padding: scrolled ? "0.45rem 0.5rem 0.45rem 1.25rem" : "1.25rem 1.5rem",
           background: scrolled ? "rgba(255, 255, 255, 0.72)" : "transparent",
-          border: scrolled
-            ? "1px solid rgba(0, 0, 0, 0.08)"
-            : "1px solid transparent",
+          border: scrolled ? "1px solid rgba(0, 0, 0, 0.08)" : "1px solid transparent",
           backdropFilter: scrolled ? "blur(14px)" : "none",
           WebkitBackdropFilter: scrolled ? "blur(14px)" : "none",
-          boxShadow: scrolled
-            ? "0 12px 30px -10px rgba(0, 0, 0, 0.12), 0 4px 12px -5px rgba(0, 0, 0, 0.05)"
-            : "none",
+          boxShadow: scrolled ? "0 12px 30px -10px rgba(0, 0, 0, 0.12), 0 4px 12px -5px rgba(0, 0, 0, 0.05)" : "none",
           transition: "all 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
           pointerEvents: "auto",
         }}
       >
-        {}
         <div style={{ flexShrink: 0 }}>
           <Wordmark light={!scrolled} />
         </div>
 
-        {}
         <nav
           className="hidden md:flex items-center justify-center overflow-hidden"
           style={{
-            flex: 1,
+            flex: scrolled ? 0 : 1,
             opacity: scrolled ? 0 : 1,
             width: scrolled ? "0" : "auto",
             transform: scrolled ? "scale(0.95)" : "scale(1)",
@@ -145,10 +137,10 @@ function MarketingNav() {
               type="button"
               onClick={() => goTo(s.id)}
               className="link-rise py-1 text-sm font-medium transition-colors duration-150 whitespace-nowrap"
-              style={{ color: "rgba(255, 255, 255, 0.78)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+              style={{ color: scrolled ? "var(--color-mute)" : "rgba(255, 255, 255, 0.78)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = scrolled ? "var(--color-ink)" : "#fff")}
               onMouseLeave={(e) =>
-                (e.currentTarget.style.color = "rgba(255, 255, 255, 0.78)")
+                (e.currentTarget.style.color = scrolled ? "var(--color-mute)" : "rgba(255, 255, 255, 0.78)")
               }
             >
               {s.label}
@@ -156,7 +148,6 @@ function MarketingNav() {
           ))}
         </nav>
 
-        {}
         <div className="flex items-center gap-2" style={{ flexShrink: 0 }}>
           <Link
             to="/admin"
@@ -164,9 +155,7 @@ function MarketingNav() {
             style={{
               padding: scrolled ? "0.45rem 1.1rem" : "0.6rem 1.25rem",
               fontSize: scrolled ? "0.825rem" : "0.875rem",
-              boxShadow: scrolled
-                ? "0 4px 12px rgba(124,58,237,0.2)"
-                : "0 8px 20px rgba(124,58,237,0.25)",
+              boxShadow: scrolled ? "0 4px 12px rgba(124,58,237,0.2)" : "0 8px 20px rgba(124,58,237,0.25)",
               transition: "all 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
             }}
           >
@@ -191,7 +180,6 @@ function MarketingNav() {
             </svg>
           </Link>
 
-          {}
           <div
             className="flex items-center md:hidden"
             style={{
@@ -209,9 +197,9 @@ function MarketingNav() {
                 onClick={() => setMenuOpen((v) => !v)}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-sm"
                 style={{
-                  borderColor: "rgba(255,255,255,0.3)",
-                  background: "rgba(255,255,255,0.12)",
-                  color: "#fff",
+                  borderColor: scrolled ? "var(--color-edge)" : "rgba(255,255,255,0.3)",
+                  background: scrolled ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.12)",
+                  color: scrolled ? "var(--color-ink)" : "#fff",
                 }}
               >
                 <svg
@@ -235,7 +223,6 @@ function MarketingNav() {
         </div>
       </div>
 
-      {}
       {!scrolled && menuOpen && (
         <div
           className="border-t border-edge/60 bg-bg/95 backdrop-blur-md md:hidden animate-step-in"

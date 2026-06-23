@@ -187,7 +187,7 @@ export function Landing() {
 
             <button
               type="button"
-              onClick={() => lenis?.scrollTo("#how-it-works", { offset: -72 })}
+              onClick={() => lenis?.scrollTo("#how-it-works", { offset: 0 })}
               style={{
                 display: "inline-flex",
                 alignItems: "center",

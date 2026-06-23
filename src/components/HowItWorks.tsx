@@ -31,7 +31,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="w-full py-20 sm:py-28"
+      className="w-full min-h-screen flex flex-col justify-center py-20 sm:py-28"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
 
