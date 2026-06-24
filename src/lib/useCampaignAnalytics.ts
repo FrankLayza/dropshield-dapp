@@ -287,7 +287,7 @@ export function useMyCampaigns(admin?: string): UseQueryResult<MergedCampaign[],
 export function useClaimCount(
   address?: Address,
   fromBlock?: bigint,
-  active = false,
+  _active = false,
 ): UseQueryResult<number, Error> {
   const publicClient = usePublicClient();
   const chainId = useChainId();
@@ -296,7 +296,7 @@ export function useClaimCount(
     queryKey: ["claimCount", chainId, address?.toLowerCase()],
     enabled: !!publicClient && !!address,
     staleTime: 15_000,
-    refetchInterval: active ? 20_000 : false,
+    refetchInterval: false,
     queryFn: async () => {
       const client = publicClient! as PublicClient;
       const latest = await client.getBlockNumber();
@@ -329,7 +329,7 @@ export function useCampaignClaimCounts(campaigns: MergedCampaign[]): CampaignCla
       queryKey: ["claimCount", chainId, c.address.toLowerCase()],
       enabled: !!publicClient,
       staleTime: 15_000,
-      refetchInterval: (c.status === "active" ? 20_000 : false) as number | false,
+      refetchInterval: false,
       queryFn: async () => {
         const client = publicClient! as PublicClient;
         const latest = await client.getBlockNumber();

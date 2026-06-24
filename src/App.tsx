@@ -1,69 +1,74 @@
-import { useState } from "react";
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { useState, useEffect, lazy, Suspense } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { ReactLenis, useLenis } from "lenis/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Landing } from "@/pages/Landing";
-import { Dashboard } from "@/pages/Dashboard";
-import { CampaignWizard } from "@/pages/CampaignWizard";
-import { CampaignDetail } from "@/pages/CampaignDetail";
-import { Claim } from "@/pages/Claim";
-import { ConnectButton } from "@/components/ConnectButton";
+import { Wordmark } from "@/components/Wordmark";
+
+/* *
+ * Everything web3 (wagmi/RainbowKit/MetaMask/WalletConnect + Zama FHE) is
+ * isolated in AppSection and loaded lazily, so the marketing landing `/` ships
+ * none of it. See plans/reflective-purring-cray.md. */
+const AppSection = lazy(() => import("@/AppSection"));
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check, { passive: true });
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+}
 
 export function App() {
   const { pathname } = useLocation();
-  const isLanding = pathname === "/";
+  const isMobile = useIsMobile();
+  const isApp =
+    pathname.startsWith("/admin") || pathname.startsWith("/claim");
+
+  const content = (
+    <div className="min-h-full bg-bg text-ink noise-overlay mesh-gradient-bg">
+      <SpeedInsights />
+
+      {isApp ? (
+        <Suspense fallback={<AppLoading />}>
+          <AppSection />
+        </Suspense>
+      ) : (
+        <>
+          <MarketingNav />
+          <main>
+            <Landing />
+          </main>
+        </>
+      )}
+    </div>
+  );
+
+  if (isMobile) {
+    return content;
+  }
 
   return (
     <ReactLenis
       root
       options={{ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.95 }}
     >
-      <div className="min-h-full bg-bg text-ink noise-overlay mesh-gradient-bg">
-        <SpeedInsights />
-
-        {isLanding ? <MarketingNav /> : <AppNav pathname={pathname} />}
-
-        <main
-          className={
-            isLanding ? "" : "mx-auto max-w-6xl px-4 pb-16 pt-3 sm:px-6"
-          }
-        >
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/admin" element={<Dashboard />} />
-            <Route path="/admin/new" element={<CampaignWizard />} />
-            <Route path="/admin/c/:address" element={<CampaignDetail />} />
-            <Route path="/claim" element={<Claim />} />
-            <Route path="/claim/:address" element={<Claim />} />
-            <Route path="*" element={<Landing />} />
-          </Routes>
-        </main>
-      </div>
+      {content}
     </ReactLenis>
   );
 }
 
-
-function Wordmark({ light }: { light?: boolean }) {
+function AppLoading() {
   return (
-    <Link
-      to="/"
-      className="flex items-center gap-1.5 hover:opacity-80"
-      style={{
-        color: light ? "#fff" : "var(--color-ink)",
-        transition:
-          "color 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s ease",
-      }}
-    >
-      <img
-        src="/illustrations/enveil-logo-2.svg"
-        alt="Enveil Logo"
-        className="h-5 w-auto"
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <span
+        className="inline-block h-7 w-7 animate-spin rounded-full border-2 border-edge border-t-violet"
+        aria-label="Loading"
       />
-      <span className="font-wordmark text-base lowercase tracking-wider sm:text-lg">
-        enveil
-      </span>
-    </Link>
+    </div>
   );
 }
 
@@ -82,18 +87,30 @@ function MarketingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useLenis(({ scroll }: { scroll: number }) => {
-    const isScrolled = scroll > 80;
-    setScrolled(isScrolled);
-    if (isScrolled) {
-      setMenuOpen(false);
-    }
-  });
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 80;
+      setScrolled(isScrolled);
+      if (isScrolled) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const goTo = (id: string) => {
     setMenuOpen(false);
     const offset = id === "how-it-works" ? 0 : -72;
-    lenis?.scrollTo(`#${id}`, { offset });
+    if (lenis) {
+      lenis.scrollTo(`#${id}`, { offset });
+    } else {
+      const el = document.getElementById(id);
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY + offset;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    }
   };
 
   return (
@@ -252,80 +269,3 @@ function MarketingNav() {
   );
 }
 
-
-function AppNav({ pathname }: { pathname: string }) {
-  return (
-    <header className="sticky top-0 z-30 border-b border-edge/60 bg-bg/85 backdrop-blur-md">
-      {/* Desktop Header */}
-      <div className="mx-auto hidden max-w-6xl items-center justify-between px-4 py-3.5 sm:flex sm:px-6">
-        <Wordmark />
-        <nav className="flex items-center gap-4 sm:gap-5">
-          <NavLink to="/admin" active={pathname.startsWith("/admin")}>
-            Create
-          </NavLink>
-          <NavLink to="/claim" active={pathname.startsWith("/claim")}>
-            Claim
-          </NavLink>
-          <span className="hidden h-5 w-px bg-edge sm:block" aria-hidden />
-          <ConnectButton />
-        </nav>
-      </div>
-
-      {/* Mobile Header (two rows to prevent cramping) */}
-      <div className="flex flex-col gap-2.5 px-4 py-3 sm:hidden">
-        <div className="flex items-center justify-between">
-          <Wordmark />
-          <ConnectButton />
-        </div>
-        <div className="grid grid-cols-2 gap-1 rounded-xl bg-panel-2 p-1 border border-edge/40">
-          <Link
-            to="/admin"
-            className={
-              "flex items-center justify-center rounded-lg py-2 text-xs font-semibold transition-all duration-150 " +
-              (pathname.startsWith("/admin")
-                ? "bg-panel text-violet-deep shadow-xs"
-                : "text-mute hover:text-ink")
-            }
-          >
-            Create
-          </Link>
-          <Link
-            to="/claim"
-            className={
-              "flex items-center justify-center rounded-lg py-2 text-xs font-semibold transition-all duration-150 " +
-              (pathname.startsWith("/claim")
-                ? "bg-panel text-violet-deep shadow-xs"
-                : "text-mute hover:text-ink")
-            }
-          >
-            Claim
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-
-function NavLink({
-  to,
-  active,
-  children,
-}: {
-  to: string;
-  active: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      to={to}
-      aria-current={active ? "page" : undefined}
-      className={
-        "link-rise py-1 text-sm font-medium transition-colors duration-150 " +
-        (active ? "text-violet-deep" : "text-mute hover:text-ink")
-      }
-    >
-      {children}
-    </Link>
-  );
-}
