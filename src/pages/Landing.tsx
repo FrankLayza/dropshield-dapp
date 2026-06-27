@@ -48,7 +48,7 @@ export function Landing() {
       {}
       <section
         ref={heroRef}
-        className="relative overflow-hidden pt-40 pb-24 text-center min-h-[90vh] flex items-center justify-center bg-[url('/illustrations/hero-bg.png')] bg-center bg-no-repeat bg-[length:auto_100%] md:bg-cover"
+        className="relative overflow-hidden pt-28 pb-24 text-center min-h-[90vh] flex items-start justify-center bg-[url('/illustrations/hero-bg.png')] bg-center bg-no-repeat bg-[length:auto_100%] md:bg-cover"
       >
         {}
         <div
@@ -106,19 +106,17 @@ export function Landing() {
 
           {}
           <h1
-            className="js-title mx-auto mb-6 max-w-3xl font-display font-extrabold leading-[1.04] tracking-tight text-white text-[clamp(2.15rem,6vw,4.5rem)]"
+            className="js-title mx-auto mb-6 max-w-4xl font-display font-extrabold leading-[1.08] tracking-tight text-white text-[clamp(2.15rem,5.5vw,4.5rem)]"
           >
-            Token grants shouldn't be{" "}
+            <span style={{ display: "block" }}>Paying your contributors</span>
             <span
               style={{
                 position: "relative",
-                display: "inline-block",
+                display: "block",
                 color: "var(--color-violet-line)",
-                whiteSpace: "nowrap",
               }}
             >
-              everyone's business.
-              <UnderlineSquiggle />
+              shouldn't come with an audience.
             </span>
           </h1>
 
@@ -133,9 +131,8 @@ export function Landing() {
               margin: "0 auto 2.25rem",
             }}
           >
-            Enveil secures every allocation on-chain. Your contributors
-            reveal and claim only their own private grant — amounts stay
-            confidential from everyone else. Forever.
+            Enveil encrypts every allocation before it leaves your browser. Your contributors
+            see only their own amount and the chain sees nothing but a verified claim.
           </p>
 
           {}
