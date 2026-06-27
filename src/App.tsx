@@ -22,6 +22,22 @@ function useIsMobile() {
   return isMobile;
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  const lenis = useLenis();
+
+  useEffect(() => {
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: true });
+      lenis.resize();
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, lenis]);
+
+  return null;
+}
+
 export function App() {
   const { pathname } = useLocation();
   const isMobile = useIsMobile();
@@ -30,6 +46,7 @@ export function App() {
 
   const content = (
     <div className="min-h-full bg-bg text-ink noise-overlay mesh-gradient-bg">
+      <ScrollToTop />
       <SpeedInsights />
 
       {isApp ? (

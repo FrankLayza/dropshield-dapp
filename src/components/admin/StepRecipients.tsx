@@ -7,6 +7,7 @@ import {
   totalRawUnits,
   formatTokens,
   recipientNoun,
+  isValidEmail,
 } from "@/lib/recipients";
 import { CampaignTypeSelector } from "@/components/admin/CampaignTypeSelector";
 import { ScheduleBuilder } from "@/components/admin/ScheduleBuilder";
@@ -82,8 +83,15 @@ export function StepRecipients({
   );
 
   const addRow = () =>
-    setRecipients([...recipients, { id: newId(), address: "", amount: "", label: "" }]);
-  const editRow = (id: string, field: "address" | "amount" | "label", value: string) =>
+    setRecipients([
+      ...recipients,
+      { id: newId(), address: "", amount: "", label: "", email: "" },
+    ]);
+  const editRow = (
+    id: string,
+    field: "address" | "amount" | "label" | "email",
+    value: string,
+  ) =>
     setRecipients(recipients.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
   const removeRow = (id: string) => setRecipients(recipients.filter((r) => r.id !== id));
 
@@ -144,14 +152,17 @@ export function StepRecipients({
         <UploadIcon />
         <p className="mt-3 text-lg font-medium text-ink">Drop recipients.csv here</p>
         <p className="mt-1 text-sm text-mute">
-          Columns: <span className="font-mono text-faint">address, amount, label</span> — label
-          is optional, or add rows manually below
+          Columns:{" "}
+          <span className="font-mono text-faint">
+            address, amount, label (optional), email (optional)
+          </span>{" "}
+          — or add rows manually below
         </p>
       </label>
 
       {}
       <div className="mt-6 overflow-hidden rounded-xl border border-edge bg-panel shadow-sm">
-        <div className="hidden sm:grid grid-cols-[1fr_170px_120px_40px] items-center gap-3 border-b border-edge bg-panel-2 px-4 py-3">
+        <div className="hidden sm:grid grid-cols-[1fr_140px_110px_180px_40px] items-center gap-3 border-b border-edge bg-panel-2 px-4 py-3">
           <span className="text-xs font-medium uppercase tracking-wider text-faint">
             Wallet address
           </span>
@@ -160,6 +171,9 @@ export function StepRecipients({
           </span>
           <span className="text-right text-xs font-medium uppercase tracking-wider text-faint">
             Amount
+          </span>
+          <span className="text-xs font-medium uppercase tracking-wider text-faint/60">
+            Email <span className="normal-case">(optional)</span>
           </span>
           <span />
         </div>
@@ -183,7 +197,7 @@ export function StepRecipients({
             return (
               <div
                 key={r.id}
-                className="flex flex-col gap-3 border-b border-edge/60 px-4 py-4 last:border-b-0 sm:grid sm:grid-cols-[1fr_170px_120px_40px] sm:items-start sm:gap-3 sm:py-3 transition-colors hover:bg-panel-2/30"
+                className="flex flex-col gap-3 border-b border-edge/60 px-4 py-4 last:border-b-0 sm:grid sm:grid-cols-[1fr_140px_110px_180px_40px] sm:items-start sm:gap-3 sm:py-3 transition-colors hover:bg-panel-2/30"
               >
                 <div className="w-full">
                     <input
@@ -221,7 +235,7 @@ export function StepRecipients({
                         placeholder="Amount"
                         inputMode="decimal"
                         className={
-                          "w-full sm:w-32 rounded-[10px] border px-3 py-2.5 text-left sm:text-right font-mono text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-4 " +
+                          "w-full sm:w-28 rounded-[10px] border px-3 py-2.5 text-left sm:text-right font-mono text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-4 " +
                           (amtIssue
                             ? "border-danger/40 bg-danger/5 text-danger placeholder:text-danger/40 focus:border-danger focus-visible:outline-danger focus:ring-danger/20"
                             : "border-edge bg-panel-2/65 text-ink placeholder:text-mute/50 hover:border-edge-strong focus:border-(--card-accent) focus:bg-panel focus-visible:outline-(--card-accent) focus:ring-(--card-accent)/10")
@@ -241,6 +255,27 @@ export function StepRecipients({
                   >
                     <TrashIcon />
                   </button>
+                </div>
+                {/* Email — de-emphasised */}
+                <div className="w-full">
+                  <input
+                    type="email"
+                    value={r.email ?? ""}
+                    onChange={(e) => editRow(r.id, "email", e.target.value)}
+                    placeholder="email@example.com"
+                    className={
+                      "w-full rounded-[10px] border px-3 py-2.5 text-sm transition-all duration-150 focus:outline-none focus:ring-4 " +
+                      (r.email && !isValidEmail(r.email)
+                        ? "border-warning-text/40 bg-warning-bg/30 text-ink placeholder:text-mute/40 focus:border-warning-text focus:ring-warning-text/10"
+                        : "border-edge/60 bg-panel-2/40 text-ink placeholder:text-faint/60 hover:border-edge focus:border-(--card-accent) focus:bg-panel focus-visible:outline-(--card-accent) focus:ring-(--card-accent)/10")
+                    }
+                  />
+                  {r.email && !isValidEmail(r.email) && (
+                    <span className="mt-1 flex items-center gap-1 text-[11px] text-warning-text">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                      Invalid email format
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={() => removeRow(r.id)}
@@ -283,6 +318,18 @@ export function StepRecipients({
           <p className="text-sm text-mute">
             <span className="font-mono font-medium text-ink">{validCount}</span>{" "}
             {noun}{validCount === 1 ? "" : "s"}
+            {(() => {
+              const withEmail = recipients.filter(
+                (r) => r.email && isValidEmail(r.email)
+              ).length;
+              return withEmail > 0 ? (
+                <>
+                  <span className="mx-2 text-ink/30">·</span>
+                  <span className="font-mono font-medium text-ink">{withEmail}</span>{" "}
+                  with email
+                </>
+              ) : null;
+            })()}
             <span className="mx-2 text-ink/30">·</span>
             <span className="font-mono font-bold" style={{ color: "var(--card-accent)" }}>
               {formatTokens(total)}
