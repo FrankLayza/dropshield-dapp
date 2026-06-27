@@ -224,7 +224,6 @@ export function CampaignWizard() {
           />
         )}
 
-        {}
         {isVesting && current === 2 && (
           <StepVesting
             tokenAddress={tokenAddress}

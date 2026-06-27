@@ -5,14 +5,12 @@ export const TOKEN_DECIMALS = 6;
 const ONE = 10n ** BigInt(TOKEN_DECIMALS);
 
 export interface Recipient {
-  
   id: string;
-  
   address: string;
-  
   amount: string;
-  
   label?: string;
+  /** Optional — used for email delivery only, never stored on-chain */
+  email?: string;
 }
 
 
@@ -96,12 +94,16 @@ export function parseRecipientsCsv(text: string, makeId: () => string): Recipien
   for (const line of lines) {
     const cells = line.split(/[,\t;]/).map((c) => c.trim());
     if (cells.length < 2) continue;
-    const [address, amount, label] = cells;
-    
+    const [address, amount, label, email] = cells;
     if (/address/i.test(address) && /amount/i.test(amount)) continue;
-    rows.push({ id: makeId(), address, amount, label: label ?? "" });
+    rows.push({ id: makeId(), address, amount, label: label ?? "", email: email ?? "" });
   }
   return rows;
+}
+
+
+export function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 

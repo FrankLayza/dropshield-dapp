@@ -23,6 +23,54 @@ function NewCampaignButton({ className = "" }: { className?: string }) {
   );
 }
 
+function CampaignCardSkeleton() {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-edge bg-panel h-full">
+      {/* Image area */}
+      <div className="h-32 w-full bg-panel-2/80 relative" />
+      
+      {/* Title & Address */}
+      <div className="px-5 pt-4 space-y-2">
+        <div className="h-5 w-3/4 rounded bg-violet-tint/40" />
+        <div className="h-3 w-1/3 rounded bg-violet-tint/30" />
+      </div>
+
+      {/* Middle split section */}
+      <div className="mt-4 px-5 py-4 border-y border-edge/40 bg-panel-2/40 flex items-center divide-x divide-edge/60 gap-4">
+        <div className="flex-1 flex items-center gap-3">
+          <div className="h-8 w-8 rounded-full bg-violet-tint/30 shrink-0" />
+          <div className="space-y-1.5 flex-1 min-w-0">
+            <div className="h-2 w-8 rounded bg-violet-tint/30" />
+            <div className="h-3.5 w-12 rounded bg-violet-tint/40" />
+          </div>
+        </div>
+        <div className="flex-1 flex items-center gap-3 pl-4">
+          <div className="h-8 w-8 rounded-full bg-violet-tint/30 shrink-0" />
+          <div className="space-y-1.5 flex-1 min-w-0">
+            <div className="h-2 w-16 rounded bg-violet-tint/30" />
+            <div className="h-3.5 w-10 rounded bg-violet-tint/40" />
+          </div>
+        </div>
+      </div>
+
+      {/* Badges & Action */}
+      <div className="px-5 py-3 flex items-center justify-between gap-3">
+        <div className="flex gap-1.5">
+          <div className="h-5 w-24 rounded bg-violet-tint/30" />
+          <div className="h-5 w-12 rounded bg-violet-tint/30" />
+        </div>
+        <div className="h-8 w-8 rounded-full bg-violet-tint/30 shrink-0" />
+      </div>
+
+      {/* Footer */}
+      <div className="mt-auto px-5 pb-4 flex items-center justify-between border-t border-edge/20 pt-3">
+        <div className="h-3 w-32 rounded bg-violet-tint/30" />
+        <div className="h-4 w-4 rounded-full bg-violet-tint/30" />
+      </div>
+    </div>
+  );
+}
+
 export function Dashboard() {
   const { address, isConnected } = useAccount();
   const { data: campaigns, isLoading, isError, isFetching, refetch } = useMyCampaigns(address);
@@ -51,7 +99,6 @@ export function Dashboard() {
 
   return (
     <div>
-      {}
       <header className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-ink">Campaigns</h1>
@@ -62,7 +109,6 @@ export function Dashboard() {
         {isConnected && <NewCampaignButton />}
       </header>
 
-      {}
       {!isConnected ? (
         <div className="rounded-2xl border border-violet-edge bg-violet-tint/40 px-6 py-14 text-center">
           <h2 className="font-display text-lg font-semibold text-ink">Connect your wallet</h2>
@@ -97,24 +143,9 @@ export function Dashboard() {
               </div>
             ))}
           </div>
-          <div className="space-y-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="rounded-2xl border border-violet-edge/40 bg-panel p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="w-1/3 space-y-2">
-                    <div className="h-5 w-full animate-pulse rounded bg-violet-tint/70" />
-                    <div className="h-3 w-1/2 animate-pulse rounded bg-violet-tint/70" />
-                  </div>
-                  <div className="h-6 w-16 animate-pulse rounded-full bg-violet-tint/70" />
-                </div>
-                <div className="mt-6 space-y-2.5">
-                  <div className="h-2 w-full animate-pulse rounded-full bg-violet-tint/70" />
-                  <div className="flex items-center justify-between">
-                    <div className="h-3 w-1/4 animate-pulse rounded bg-violet-tint/70" />
-                    <div className="h-3 w-1/6 animate-pulse rounded bg-violet-tint/70" />
-                  </div>
-                </div>
-              </div>
+              <CampaignCardSkeleton key={i} />
             ))}
           </div>
         </div>

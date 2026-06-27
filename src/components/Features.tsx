@@ -17,7 +17,7 @@ const USE_CASES = [
     tagline: "Salaries stay between you and your team.",
     body: "Pay DAO contributors on-chain without posting everyone's salary to a public explorer. Enveil keeps each amount encrypted — paid verifiably, but privately.",
     bestFor: "DAOs, recurring contributor payments",
-    illustration: "/illustrations/salary-privacy.png",
+    illustration: "/illustrations/contributor-img.png",
     bg: "#DFC9C0",
     accent: "var(--color-gold)",
     accentTint: "var(--color-gold-tint)",
@@ -27,7 +27,7 @@ const USE_CASES = [
     tagline: "Cap-table privacy, on-chain.",
     body: "Token distributions expose each investor's allocation to the public. Enveil delivers them privately — every recipient reveals their own share without exposing the total or the list.",
     bestFor: "token distributions, SAFT payouts",
-    illustration: "/illustrations/no-roster.png",
+    illustration: "/illustrations/investor-img.png",
     bg: "#DFD1F4",
     accent: "var(--color-violet)",
     accentTint: "var(--color-violet-tint)",
@@ -37,7 +37,7 @@ const USE_CASES = [
     tagline: "Reward members without a public leaderboard.",
     body: "Airdrops put every reward amount on display forever. Enveil encrypts allocations on-chain — members reveal and claim their own, and nobody else's.",
     bestFor: "community airdrops, contributor bonuses",
-    illustration: "/illustrations/verify-before-claim.png",
+    illustration: "/illustrations/community-img.png",
     bg: "#DFF3F6",
     accent: "#0891b2",
     accentTint: "#e0f7fa",
@@ -113,7 +113,6 @@ export function Features() {
   return (
     <section ref={sectionRef} className="features-section" id="use-cases">
       <div className="features-inner">
-        {}
         <div className="features-heading js-features-header">
           <span className="features-label">Use cases</span>
           <h2 className="features-title">

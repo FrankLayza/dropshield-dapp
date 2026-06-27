@@ -45,12 +45,10 @@ export function Landing() {
 
   return (
     <div className="relative">
-      {}
       <section
         ref={heroRef}
-        className="relative overflow-hidden pt-28 pb-24 text-center min-h-[90vh] flex items-start justify-center bg-[url('/illustrations/hero-bg.png')] bg-center bg-no-repeat bg-[length:auto_100%] md:bg-cover"
+        className="relative overflow-hidden pt-28 pb-24 text-center min-h-[90vh] flex items-start justify-center bg-[url('/illustrations/hero-bg.png')] bg-center bg-no-repeat bg-size-[auto_100%] md:bg-cover"
       >
-        {}
         <div
           aria-hidden
           style={{
@@ -61,7 +59,6 @@ export function Landing() {
           }}
         />
 
-        {}
         <div
           style={{
             position: "relative",
@@ -71,7 +68,6 @@ export function Landing() {
             padding: "0 1.5rem",
           }}
         >
-          {}
           <span
             className="js-eyebrow"
             style={{
@@ -104,7 +100,6 @@ export function Landing() {
             Confidential token distribution
           </span>
 
-          {}
           <h1
             className="js-title mx-auto mb-6 max-w-4xl font-display font-extrabold leading-[1.08] tracking-tight text-white text-[clamp(2.15rem,5.5vw,4.5rem)]"
           >
@@ -120,7 +115,6 @@ export function Landing() {
             </span>
           </h1>
 
-          {}
           <p
             className="js-sub"
             style={{
@@ -135,7 +129,6 @@ export function Landing() {
             see only their own amount and the chain sees nothing but a verified claim.
           </p>
 
-          {}
           <div
             className="js-cta"
             style={{
@@ -211,7 +204,6 @@ export function Landing() {
         </div>
       </section>
 
-      {}
       <div className="mx-auto max-w-6xl border-t border-edge px-4 py-10 sm:px-6">
         <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-faint">
           Built on audited, open infrastructure
@@ -229,16 +221,12 @@ export function Landing() {
         </div>
       </div>
 
-      {}
       <HowItWorks />
 
-      {}
       <Features />
 
-      {}
       <Security />
 
-      {}
       <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         <div
           className="flex flex-col items-start gap-6 rounded-3xl border border-violet-edge p-9 sm:flex-row sm:items-center sm:justify-between sm:p-12"
@@ -278,34 +266,7 @@ export function Landing() {
         </div>
       </section>
 
-      {}
       <Footer />
     </div>
-  );
-}
-
-
-function UnderlineSquiggle() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 200 12"
-      preserveAspectRatio="none"
-      style={{
-        position: "absolute",
-        bottom: "-0.4rem",
-        left: 0,
-        height: "0.75rem",
-        width: "100%",
-      }}
-    >
-      <path
-        d="M3 7 C 40 2, 80 11, 120 5 S 180 3, 197 7"
-        fill="none"
-        stroke="var(--color-violet-line)"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-    </svg>
   );
 }
