@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { motion, useReducedMotion, useMotionValue, animate } from "framer-motion";
 import { useAccount, useBalance } from "wagmi";
@@ -27,16 +27,22 @@ const LOW_ETH_THRESHOLD = 5_000_000_000_000_000n;
 
 /* ── Claim page state machine ─────────────────────────────────────────
  *
- * State 0: Pre-connect      — campaign address in URL, no wallet connected
- * State 1: Checking          — wallet connected, checkRecipient in flight
- * State 2: Claim Found       — checkRecipient true + payload loaded
- * State 2a: Confirmed, no payload — checkRecipient true, no payload yet
- * State 3: No Claim Found    — checkRecipient false
- * State 4: Already Claimed   — isClaimedQuery true
- * State 5: Vesting Active    — vesting payload loaded
+ * Allocations can ONLY be claimed through the unique, self-contained claim
+ * link the campaign creator sends each recipient (`/claim#z=<payload>`). That
+ * link carries the encrypted handle + input proof + EIP-712 signature — the
+ * page never accepts a manually uploaded/pasted payload.
  *
- * Backward compatibility: if a #z= hash fragment is present, the page
- * skips the registry check and loads the payload directly (legacy link).
+ * No-link    — no campaign in the URL: visitor didn't arrive from a link.
+ *              Empty state pointing them to their personal claim link.
+ * Pre-connect — campaign discovery link (`/claim/:address`), wallet not yet
+ *              connected: prompt connect to check eligibility.
+ * Checking    — wallet connected, registry checkRecipient in flight.
+ * Confirmed-no-payload — registry confirms recipient, but this is a discovery
+ *              link (no payload) → tell them to open their personal claim link.
+ * No-claim    — registry says this wallet isn't a recipient.
+ * Claim-found / Already-claimed / Legacy-loaded — full payload present
+ *              (from the `#z=` claim link): reveal + claim flow.
+ * Vesting     — vesting payload loaded from the claim link.
  * ──────────────────────────────────────────────────────────────────── */
 
 type ClaimPageState =
@@ -74,9 +80,6 @@ export function Claim() {
   const [decryptedAmount, setDecryptedAmount] = useState<bigint | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-  const [dragging, setDragging] = useState(false);
-  const [showJsonInput, setShowJsonInput] = useState(false);
-  const [pastedJson, setPastedJson] = useState("");
 
   /* ── Vesting state ──────────────────────────────────────────────── */
   const [vestingPayload, setVestingPayload] = useState<VestingPayload | null>(null);
@@ -172,119 +175,6 @@ export function Claim() {
     campaignAddr && campaignAddr !== ("" as any) ? campaignAddr : undefined,
   );
   const onChainCampaignName = campaignNameQuery.data as string | undefined;
-
-  /* ── Payload loading (from file / paste) ────────────────────────── */
-  const loadPayload = useCallback(
-    (data: any) => {
-      setErrorMsg("");
-      setSuccessMsg("");
-      setDecryptedAmount(null);
-      setRevealHandle("");
-
-      try {
-        // Vesting JSON
-        if (data?.type === "vesting" && Array.isArray(data.deliveries)) {
-          const mine =
-            (connectedAddress &&
-              data.deliveries.find(
-                (d: any) => d.address?.toLowerCase() === connectedAddress.toLowerCase(),
-              )) ||
-            data.deliveries[0];
-          if (mine) {
-            setVestingPayload({
-              r: mine.address,
-              l: mine.label ?? "",
-              total: mine.totalAmount,
-              t: (mine.tranches ?? []).map((tr: any) => ({
-                i: tr.index,
-                c: tr.campaignAddress,
-                u: tr.unlockTs,
-                a: tr.amount,
-                h: tr.encryptedInput?.handle ?? tr.h,
-                p: tr.encryptedInput?.inputProof ?? tr.p,
-                s: tr.signature ?? tr.s,
-              })),
-            });
-            return;
-          }
-        }
-
-        const campaign = data.campaignAddress;
-        let auth = null;
-
-        if (Array.isArray(data.authorizations)) {
-          if (connectedAddress) {
-            auth = data.authorizations.find(
-              (x: any) => x.recipient?.toLowerCase() === connectedAddress.toLowerCase()
-            );
-          }
-          if (!auth) auth = data.authorizations[0];
-        } else if (data.recipient && data.signature) {
-          auth = data;
-        }
-
-        if (!campaign || !auth) {
-          setErrorMsg("Invalid payload structure. Missing campaign or authorization data.");
-          return;
-        }
-
-        setCampaignAddress(campaign);
-        setRecipientAddress(auth.recipient || auth.address);
-        setPlaintextAmount(auth.amount);
-        setEncryptedHandle(auth.encryptedInput?.handle || auth.handle);
-        setInputProof(auth.encryptedInput?.inputProof || auth.inputProof || auth.proof);
-        setSignature(auth.signature || auth.sig);
-        setRecipientLabel(auth.label || "");
-      } catch (err) {
-        setErrorMsg("Failed to parse JSON file.");
-      }
-    },
-    [connectedAddress]
-  );
-
-  const onDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setDragging(false);
-      const file = e.dataTransfer.files?.[0];
-      if (file) {
-        file.text().then((text) => {
-          try {
-            const parsed = JSON.parse(text);
-            loadPayload(parsed);
-          } catch {
-            setErrorMsg("Uploaded file is not a valid JSON.");
-          }
-        });
-      }
-    },
-    [loadPayload]
-  );
-
-  const handlePasteSubmit = () => {
-    try {
-      const parsed = JSON.parse(pastedJson);
-      loadPayload(parsed);
-      setShowJsonInput(false);
-      setPastedJson("");
-    } catch {
-      setErrorMsg("Pasted text is not valid JSON.");
-    }
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) {
-      f.text().then((text) => {
-        try {
-          loadPayload(JSON.parse(text));
-        } catch {
-          setErrorMsg("Invalid JSON file.");
-        }
-      });
-    }
-    e.target.value = "";
-  };
 
   /* ── Claim / reveal hooks ───────────────────────────────────────── */
   const isLoaded = !!campaignAddress && !!encryptedHandle && !!signature;
@@ -408,10 +298,9 @@ export function Claim() {
     // Legacy hash link — payload loaded directly, skip registry
     if (hashLinkLoaded && isLoaded) return "legacy-loaded";
 
-    // No campaign address at all. If the wallet is already connected, the user
-    // just has no claim link loaded — guide them to paste/upload one rather than
-    // showing a (dead) connect button. Otherwise prompt to connect first.
-    if (!campaignAddress) return isConnected ? "no-link" : "pre-connect";
+    // No campaign in the URL → visitor didn't arrive from a claim/discovery
+    // link. Show the "open your claim link" empty state (works connected or not).
+    if (!campaignAddress) return "no-link";
 
     // Wallet not connected
     if (!isConnected) return "pre-connect";
@@ -496,8 +385,38 @@ export function Claim() {
         </div>
       )}
 
-      {/* ── State 2a: Confirmed, no payload yet ───────────────────── */}
-      {(pageState === "confirmed-no-payload" || pageState === "no-link") && (
+      {/* ── No-link: visitor didn't arrive from a claim link ───────── */}
+      {pageState === "no-link" && (
+        <div className="space-y-6 animate-step-in">
+          <div className="rounded-2xl border border-edge bg-panel p-8 text-center">
+            <span className="mx-auto mb-5 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-violet/10 text-violet">
+              <Shield size={30} />
+            </span>
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
+              Open your private claim link
+            </h1>
+            <p className="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-mute">
+              Allocations are claimed only through the unique, encrypted link the
+              campaign creator sent you — by email or direct message. Open that
+              link to privately reveal and claim your tokens.
+            </p>
+
+            <div className="mx-auto mt-6 flex max-w-sm items-start gap-2.5 rounded-xl border border-edge bg-panel-2/50 p-3.5 text-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-mute)" strokeWidth="1.8" className="mt-0.5 shrink-0">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4M12 8h.01" />
+              </svg>
+              <p className="text-xs leading-relaxed text-mute">
+                Don't have your link? Ask the campaign creator to resend it — your
+                allocation can't be looked up without it, which is what keeps it private.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Confirmed recipient via discovery link, but no payload ──── */}
+      {pageState === "confirmed-no-payload" && (
         <div className="space-y-6 animate-step-in">
           <div>
             <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
@@ -505,103 +424,34 @@ export function Claim() {
             </h1>
           </div>
 
-          {pageState === "confirmed-no-payload" ? (
-            /* Confirmation badge — registry verified this wallet is a recipient */
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center gap-3">
-              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6 9 17l-5-5" /></svg>
-              </span>
-              <div>
-                <p className="text-sm font-semibold text-emerald-800">
-                  You're confirmed as a recipient of this campaign.
-                </p>
-                <p className="text-xs text-emerald-700 mt-0.5">
-                  To load your allocation, paste your claim link below or upload the campaign file.
-                </p>
-              </div>
-            </div>
-          ) : (
-            /* no-link — wallet connected, but no claim link/payload loaded yet */
-            <div className="rounded-xl border border-violet-edge bg-violet-tint/40 p-4 flex items-center gap-3">
-              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet/10 text-violet">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                </svg>
-              </span>
-              <div>
-                <p className="text-sm font-semibold text-ink">
-                  No claim link loaded.
-                </p>
-                <p className="text-xs text-mute mt-0.5">
-                  Open the claim link your sender shared, or paste/upload your campaign file below to check your allocation.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Payload import: paste link or upload file */}
-          <div className="rounded-xl border border-edge bg-panel p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-ink">Load your allocation</h3>
-
-            {/* File upload */}
-            <label
-              onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={onDrop}
-              className={
-                "flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-6 py-10 text-center transition-colors duration-155 " +
-                (dragging
-                  ? "border-gold bg-gold/5"
-                  : "border-edge-strong hover:border-gold/60 hover:bg-panel-2")
-              }
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-mute)" strokeWidth="1.5" className="mb-2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
-              </svg>
-              <p className="text-sm font-semibold text-ink">
-                Drop your campaign file here
+          {/* Confirmation badge — registry verified this wallet is a recipient */}
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6 9 17l-5-5" /></svg>
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-emerald-800">
+                You're confirmed as a recipient of this campaign.
               </p>
-              <p className="text-xs text-mute mt-1">
-                or click to upload the JSON payload
+              <p className="text-xs text-emerald-700 mt-0.5">
+                One more step — open your personal claim link to reveal and claim.
               </p>
-              <input type="file" accept=".json" className="hidden" onChange={handleFileUpload} />
-            </label>
+            </div>
+          </div>
 
-            <div className="text-center text-xs text-faint">— OR —</div>
-
-            {/* Paste JSON */}
-            {!showJsonInput ? (
-              <button
-                onClick={() => setShowJsonInput(true)}
-                className="w-full py-2.5 rounded-lg border border-edge-strong text-sm font-semibold text-mute hover:bg-panel-2/60 hover:text-ink"
-              >
-                Paste JSON payload text
-              </button>
-            ) : (
-              <div className="space-y-3">
-                <textarea
-                  value={pastedJson}
-                  onChange={(e) => setPastedJson(e.target.value)}
-                  placeholder='Paste {"campaignAddress": "0x...", "authorizations": [...] } here'
-                  className="w-full h-32 rounded-lg border border-edge-strong bg-transparent p-3 text-xs font-mono focus:outline-none"
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setShowJsonInput(false)}
-                    className="flex-1 py-2 rounded-lg border border-edge-strong text-xs font-semibold text-mute hover:bg-panel-2/50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handlePasteSubmit}
-                    className="flex-1 py-2 rounded-lg bg-iris text-xs font-semibold text-white hover:bg-iris-dim"
-                  >
-                    Import JSON
-                  </button>
-                </div>
-              </div>
-            )}
+          {/* Direct them to their personal claim link (no manual upload) */}
+          <div className="rounded-2xl border border-edge bg-panel p-6 text-center">
+            <span className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-violet/10 text-violet">
+              <Shield size={26} />
+            </span>
+            <h3 className="font-display text-lg font-semibold tracking-tight text-ink">
+              Open your personal claim link
+            </h3>
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-mute">
+              Your encrypted allocation can only be unlocked from the unique claim
+              link the creator sent you — it carries the private authorization this
+              page needs to reveal and claim. Open that link to continue.
+            </p>
           </div>
         </div>
       )}
@@ -649,9 +499,7 @@ export function Claim() {
               Claim your tokens
             </h1>
             <p className="text-sm text-mute mt-1">
-              {pageState === "claim-found"
-                ? "Your allocation is confirmed. Reveal the amount privately, then claim."
-                : "Import your signed authorization payload, reveal the amount privately, and claim."}
+              Your allocation is confirmed. Reveal the amount privately, then claim.
             </p>
           </div>
 
@@ -665,7 +513,7 @@ export function Claim() {
                 onClick={clearPayload}
                 className="text-xs font-semibold text-danger text-left sm:text-right hover:underline"
               >
-                Clear / Import another
+                Clear
               </button>
             </div>
 
