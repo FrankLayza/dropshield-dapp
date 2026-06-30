@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "pipeline": "tsx scripts/pipeline.ts"
+    "pipeline": "tsx scripts/pipeline.ts",
+    "knip": "knip"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -42,6 +43,7 @@
     "@vercel/node": "^5.8.21",
     "@vitejs/plugin-react": "^6.0.2",
     "dotenv": "^16.4.5",
+    "knip": "^6.23.0",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.19.0",
     "typescript": "^5.9.3",

@@ -47,7 +47,7 @@ export function Landing() {
     <div className="relative">
       <section
         ref={heroRef}
-        className="relative overflow-hidden pt-28 pb-24 text-center min-h-[90vh] flex items-start justify-center bg-[url('/illustrations/hero-bg.png')] bg-center bg-no-repeat bg-size-[auto_100%] md:bg-cover"
+        className="relative overflow-hidden pt-28 pb-24 text-center min-h-[90vh] flex items-start justify-center bg-[url('/illustrations/hero-bg-2.png')] bg-center bg-no-repeat bg-size-[auto_100%] md:bg-cover"
       >
         <div
           aria-hidden
